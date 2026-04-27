@@ -42,5 +42,18 @@ namespace Voyagoo.Controllers
 
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
+
+        [HttpPut("profile-picture-update")]
+        public async Task<IActionResult> UpdateProfilePicture(IFormFile image, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId is null)
+                return Unauthorized();
+
+            var result = await _accountService.UpdateProfilePictureAsync(userId, image, cancellationToken);
+
+            return result.IsSuccess ? Ok(new { profilePictureUrl = result.Value }) : result.ToProblem();
+        }
     }
 }

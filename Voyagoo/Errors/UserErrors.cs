@@ -26,12 +26,15 @@ namespace Voyagoo.Errors
             new("User.DuplicatedConfirmation", "Email already confirmed", StatusCodes.Status400BadRequest);
 
         public static readonly Error EmailNotFound =
-    new("User.EmailNotFound", "No account found with this email", StatusCodes.Status404NotFound);
+              new("User.EmailNotFound", "No account found with this email", StatusCodes.Status404NotFound);
 
         public static readonly Error InvalidOrExpiredOtp =
             new("User.InvalidOrExpiredOtp", "OTP code is invalid or has expired", StatusCodes.Status400BadRequest);
 
         public static readonly Error OtpNotVerified =
             new("User.OtpNotVerified", "Please verify your OTP before resetting the password", StatusCodes.Status400BadRequest);
+
+        public static readonly Error InvalidImageFile =
+    new("User.InvalidImageFile", "Invalid image file. Allowed: jpg, jpeg, png, webp", StatusCodes.Status400BadRequest);
     }
 }
