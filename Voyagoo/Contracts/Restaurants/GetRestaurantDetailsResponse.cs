@@ -6,6 +6,9 @@
         string Description,
         string Address,
         double Rating,
+        string CuisineType,        
+        decimal MinPrice,           
+        decimal MaxPrice,
         List<string> ImageUrls,
         List<FeatureResponse> Features,
         List<CommentResponse> Comments

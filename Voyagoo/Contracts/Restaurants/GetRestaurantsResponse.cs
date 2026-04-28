@@ -5,6 +5,9 @@
         string Name,
         string Description,
         double Rating,
+        string CuisineType,     
+        decimal MinPrice,        
+        decimal MaxPrice,
         string? MainImageUrl
     );
 }

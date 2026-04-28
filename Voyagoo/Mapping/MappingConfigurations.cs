@@ -20,6 +20,7 @@ namespace Voyagoo.Mapping
             #region Restaurants
 
             config.NewConfig<Restaurant, GetRestaurantsResponse>()
+                .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
     .Map(dest => dest.MainImageUrl,
          src => src.Images.FirstOrDefault(i => i.IsMain) != null
              ? src.Images.First(i => i.IsMain).ImageUrl
@@ -28,6 +29,7 @@ namespace Voyagoo.Mapping
              : null);
 
             config.NewConfig<Restaurant, GetRestaurantDetailsResponse>()
+                .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
                 .Map(dest => dest.ImageUrls, src => src.Images.Select(i => i.ImageUrl).ToList())
                 .Map(dest => dest.Features, src => src.Features.Select(f => new FeatureResponse(f.FeatureId, f.Feature.Name, f.Feature.Icon)).ToList())
                 .Map(dest => dest.Comments, src => src.Comments.Select(c => new CommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.Content, c.Rating, c.CreatedAt)).ToList());

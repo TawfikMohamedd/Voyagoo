@@ -22,6 +22,18 @@ namespace Voyagoo.Contracts.Restaurants
                 .InclusiveBetween(1.0, 5.0)
                 .WithMessage("Rating must be between 1 and 5");
 
+            RuleFor(x => x.CuisineType)
+                .IsInEnum()
+                .WithMessage("Invalid cuisine type");
+
+            RuleFor(x => x.MinPrice)
+                .GreaterThan(0)
+                .WithMessage("Min price must be greater than 0");
+
+            RuleFor(x => x.MaxPrice)
+                .GreaterThan(x => x.MinPrice)
+                .WithMessage("Max price must be greater than Min price");
+
             RuleFor(x => x.FeatureIds)
                 .NotNull();
         }

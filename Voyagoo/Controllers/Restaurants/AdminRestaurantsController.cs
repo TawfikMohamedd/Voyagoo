@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Voyagoo.Abstractions;
 using Voyagoo.Abstractions.Consts;
 using Voyagoo.Contracts.Restaurants;
+using Voyagoo.Entities.Restaurants;
 using Voyagoo.Services;
 
 namespace Voyagoo.Controllers.Restaurants
@@ -48,6 +49,14 @@ namespace Voyagoo.Controllers.Restaurants
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
+        [HttpGet("cuisine-types")]
+        public IActionResult GetCuisineTypes()
+        {
+            var types = Enum.GetValues<CuisineType>()
+                .Select(c => new { id = (int)c, name = c.ToString() });
+
+            return Ok(types);
+        }
 
 
     }

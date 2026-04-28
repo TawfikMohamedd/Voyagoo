@@ -95,6 +95,9 @@ namespace Voyagoo.Services
                 Description = request.Description,
                 Address = request.Address,
                 Rating = request.Rating,
+                CuisineType = request.CuisineType,  
+                MinPrice = request.MinPrice,         
+                MaxPrice = request.MaxPrice,         
                 Features = request.FeatureIds.Select(fId => new RestaurantFeature
                 {
                     FeatureId = fId
