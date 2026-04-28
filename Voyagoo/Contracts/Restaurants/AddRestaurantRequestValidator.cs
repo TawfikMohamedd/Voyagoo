@@ -34,6 +34,22 @@ namespace Voyagoo.Contracts.Restaurants
                 .GreaterThan(x => x.MinPrice)
                 .WithMessage("Max price must be greater than Min price");
 
+            RuleFor(x => x.TablesForTwo)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Tables for two must be 0 or more");
+
+            RuleFor(x => x.TablesForFour)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Tables for four must be 0 or more");
+
+            RuleFor(x => x.TablesForSix)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Tables for six must be 0 or more");
+
+            RuleFor(x => x)
+                .Must(x => x.TablesForTwo + x.TablesForFour + x.TablesForSix > 0)
+                .WithMessage("Restaurant must have at least one table");
+
             RuleFor(x => x.FeatureIds)
                 .NotNull();
         }

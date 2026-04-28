@@ -14,6 +14,10 @@
         public decimal MinPrice { get; set; }
         public decimal MaxPrice { get; set; }
 
+        public int TablesForTwo { get; set; }
+        public int TablesForFour { get; set; }
+        public int TablesForSix { get; set; }
+
         public List<RestaurantImage> Images { get; set; } = [];
         public List<RestaurantComment> Comments { get; set; } = [];
         public List<RestaurantFeature> Features { get; set; } = [];

@@ -10,6 +10,9 @@ namespace Voyagoo.Contracts.Restaurants
         CuisineType CuisineType,   
         decimal MinPrice,            
         decimal MaxPrice,
+        int TablesForTwo,    
+        int TablesForFour,   
+        int TablesForSix,
         List<int> FeatureIds
     );
 }

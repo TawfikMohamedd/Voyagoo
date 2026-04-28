@@ -89,20 +89,12 @@ namespace Voyagoo.Services
             if (featuresExist != request.FeatureIds.Count)
                 return Result.Failure<GetRestaurantDetailsResponse>(RestaurantErrors.FeatureNotFound);
 
-            var restaurant = new Restaurant
+            var restaurant = request.Adapt<Restaurant>();
+
+            restaurant.Features = request.FeatureIds.Select(fId => new RestaurantFeature
             {
-                Name = request.Name,
-                Description = request.Description,
-                Address = request.Address,
-                Rating = request.Rating,
-                CuisineType = request.CuisineType,  
-                MinPrice = request.MinPrice,         
-                MaxPrice = request.MaxPrice,         
-                Features = request.FeatureIds.Select(fId => new RestaurantFeature
-                {
-                    FeatureId = fId
-                }).ToList()
-            };
+                FeatureId = fId
+            }).ToList();
 
             await _context.Restaurants.AddAsync(restaurant, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
