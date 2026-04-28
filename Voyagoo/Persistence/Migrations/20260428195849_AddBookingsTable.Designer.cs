@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260428195849_AddBookingsTable")]
+    partial class AddBookingsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,7 +391,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJuTu11zjGBkvXKSHEB2NSGA7MBtf5wzCu7R5bEVdiyRHxT7GKAhUDRp7FJtO3Zb7w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPYTcJP5iUaNMtWLrpVTmNFAYVVPpOnbLtxzF9Ws5rqAvNeDpLBU5oy1dE9S7sNE9A==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -404,8 +407,8 @@ namespace Voyagoo.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateOnly>("BookingDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("BookingDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");

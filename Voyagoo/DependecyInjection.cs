@@ -47,6 +47,8 @@ namespace Voyagoo
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IRestaurantService, RestaurantService>();
+            services.AddScoped<IBookingService, BookingService>();
+
 
             return services;
 

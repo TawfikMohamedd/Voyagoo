@@ -23,6 +23,7 @@ namespace Voyagoo.Persistence
         public DbSet<Feature> Features { get; set; }
         public DbSet<RestaurantFeature> RestaurantFeatures { get; set; }
         public DbSet<RestaurantComment> RestaurantComments { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
     }
 }
