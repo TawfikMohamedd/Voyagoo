@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Voyagoo.Entities;
 using Voyagoo.Entities.Restaurants;
+using Voyagoo.Entities.TourGuides;
 
 namespace Voyagoo.Persistence
 {
@@ -24,6 +25,8 @@ namespace Voyagoo.Persistence
         public DbSet<RestaurantFeature> RestaurantFeatures { get; set; }
         public DbSet<RestaurantComment> RestaurantComments { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+
+        public DbSet<TourGuide> TourGuides { get; set; }
 
     }
 }

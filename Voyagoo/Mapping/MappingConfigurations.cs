@@ -1,8 +1,10 @@
 ﻿using Mapster;
 using Voyagoo.Contracts.Authentication.Register;
 using Voyagoo.Contracts.Restaurants;
+using Voyagoo.Contracts.TourGuides;
 using Voyagoo.Entities;
 using Voyagoo.Entities.Restaurants;
+using Voyagoo.Entities.TourGuides;
 
 namespace Voyagoo.Mapping
 {
@@ -40,8 +42,14 @@ namespace Voyagoo.Mapping
 
             #endregion
 
+            #region TourGuide
 
+            config.NewConfig<TourGuide, GetTourGuidesResponse>();
 
+            config.NewConfig<TourGuide, GetTourGuideDetailsResponse>()
+                .Map(dest => dest.Languages, src => src.Languages.Select(l => l.ToString()).ToList());
+
+            #endregion
 
 
 
