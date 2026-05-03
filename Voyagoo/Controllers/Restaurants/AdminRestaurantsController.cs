@@ -49,6 +49,13 @@ namespace Voyagoo.Controllers.Restaurants
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateRestaurant(int id,[FromBody] UpdateRestaurantRequest request,CancellationToken cancellationToken)
+        {
+            var result = await _restaurantService.UpdateRestaurantAsync(id, request, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+
         [HttpGet("cuisine-types")]
         public IActionResult GetCuisineTypes()
         {

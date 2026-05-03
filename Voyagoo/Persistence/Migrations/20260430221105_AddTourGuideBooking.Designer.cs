@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430221105_AddTourGuideBooking")]
+    partial class AddTourGuideBooking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,7 +391,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMAZ8aHXAN8DJV2q58FKSqukMjyFBJBGupDI4HVxMdngt/AoxtGtdbZaaQvmu035MQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFF//Q86Zg8yDV5i2QDbxqccfkM5rq7Cy3mOkrQsuq4T2e3gp88bzYmNr9JXURd59w==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -659,6 +662,16 @@ namespace Voyagoo.Persistence.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("GuestName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("GuestPhone")
+                        .IsRequired()
+                        .HasMaxLength(11)
+                        .HasColumnType("nvarchar(11)");
 
                     b.Property<int>("NumberOfDays")
                         .HasColumnType("int");

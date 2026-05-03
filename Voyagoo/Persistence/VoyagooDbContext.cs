@@ -27,6 +27,7 @@ namespace Voyagoo.Persistence
         public DbSet<Booking> Bookings { get; set; }
 
         public DbSet<TourGuide> TourGuides { get; set; }
+        public DbSet<TourGuideBooking> TourGuideBookings { get; set; }
 
     }
 }

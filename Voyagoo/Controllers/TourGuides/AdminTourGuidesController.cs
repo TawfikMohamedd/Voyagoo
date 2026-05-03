@@ -43,5 +43,16 @@ namespace Voyagoo.Controllers.TourGuides
         {
             return Ok(_tourGuideService.GetAllLanguages());
         }
+
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTourGuide(
+            int id,
+            [FromBody] UpdateTourGuideRequest request,
+            CancellationToken cancellationToken)
+        {
+            var result = await _tourGuideService.UpdateTourGuideAsync(id, request, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
     }
 }

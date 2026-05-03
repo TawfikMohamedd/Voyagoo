@@ -7,6 +7,7 @@
         string PhoneNumber,
         string Description,
         double Rating,
+        decimal PricePerDay,
         string? ProfilePictureUrl,
         List<string> Languages
     );

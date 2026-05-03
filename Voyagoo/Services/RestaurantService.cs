@@ -178,6 +178,61 @@ namespace Voyagoo.Services
             return Result.Success();
         }
 
+        public async Task<Result<GetRestaurantDetailsResponse>> UpdateRestaurantAsync(int id,UpdateRestaurantRequest request,CancellationToken cancellationToken = default)
+        {
+            var restaurant = await _context.Restaurants
+                .Include(r => r.Features)
+                .Include(r => r.Images)
+                .Include(r => r.Comments)
+                    .ThenInclude(c => c.User)
+                .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted, cancellationToken);
+
+            if (restaurant is null)
+                return Result.Failure<GetRestaurantDetailsResponse>(RestaurantErrors.RestaurantNotFound);
+
+            // تأكد إن الـ FeatureIds موجودة في الـ DB
+            var featuresExist = await _context.Features
+                .Where(f => request.FeatureIds.Contains(f.Id))
+                .CountAsync(cancellationToken);
+
+            if (featuresExist != request.FeatureIds.Count)
+                return Result.Failure<GetRestaurantDetailsResponse>(RestaurantErrors.FeatureNotFound);
+
+            // update البيانات الأساسية
+            restaurant.Name = request.Name;
+            restaurant.Description = request.Description;
+            restaurant.Address = request.Address;
+            restaurant.Rating = request.Rating;
+            restaurant.CuisineType = request.CuisineType;
+            restaurant.MinPrice = request.MinPrice;
+            restaurant.MaxPrice = request.MaxPrice;
+            restaurant.TablesForTwo = request.TablesForTwo;
+            restaurant.TablesForFour = request.TablesForFour;
+            restaurant.TablesForSix = request.TablesForSix;
+
+            // update الـ Features
+            restaurant.Features = request.FeatureIds.Select(fId => new RestaurantFeature
+            {
+                RestaurantId = id,
+                FeatureId = fId
+            }).ToList();
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Reload عشان نرجع الـ Features محملة
+            var updated = await _context.Restaurants
+                .Where(r => r.Id == id)
+                .Include(r => r.Images)
+                .Include(r => r.Features)
+                    .ThenInclude(f => f.Feature)
+                .Include(r => r.Comments)
+                    .ThenInclude(c => c.User)
+                .AsNoTracking()
+                .FirstAsync(cancellationToken);
+
+            return Result.Success(updated.Adapt<GetRestaurantDetailsResponse>());
+        }
+
         // ─────────────────────────────────────────────
         // ADMIN - FEATURES
         // ─────────────────────────────────────────────

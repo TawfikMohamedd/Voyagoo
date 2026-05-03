@@ -15,6 +15,8 @@ namespace Voyagoo.Services
         Task<Result> AddRestaurantImagesAsync(int restaurantId, List<IFormFile> images, CancellationToken cancellationToken = default);
         Task<Result> DeleteRestaurantAsync(int id, CancellationToken cancellationToken = default);
 
+        Task<Result<GetRestaurantDetailsResponse>> UpdateRestaurantAsync(int id,UpdateRestaurantRequest request,CancellationToken cancellationToken = default);
+
         // Admin endpoints - Features
         Task<Result<List<FeatureResponse>>> GetAllFeaturesAsync(CancellationToken cancellationToken = default);
         Task<Result<FeatureResponse>> AddFeatureAsync(AddFeatureRequest request, CancellationToken cancellationToken = default);

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260430203836_AddPricePerDayToTourGuide")]
+    partial class AddPricePerDayToTourGuide
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,7 +391,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMAZ8aHXAN8DJV2q58FKSqukMjyFBJBGupDI4HVxMdngt/AoxtGtdbZaaQvmu035MQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDcknbhmyHSgdmyp75Fqg6x0ZbvziGaKDgXmrKmdzA2wHlTwbahE/kG3mi3Eo6J+gA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -646,42 +649,6 @@ namespace Voyagoo.Persistence.Migrations
                     b.ToTable("TourGuides");
                 });
 
-            modelBuilder.Entity("Voyagoo.Entities.TourGuides.TourGuideBooking", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateOnly>("BookingDate")
-                        .HasColumnType("date");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("NumberOfDays")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(10,2)");
-
-                    b.Property<int>("TourGuideId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TourGuideId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TourGuideBookings");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Voyagoo.Entities.ApplicationRole", null)
@@ -838,25 +805,6 @@ namespace Voyagoo.Persistence.Migrations
                     b.Navigation("Restaurant");
                 });
 
-            modelBuilder.Entity("Voyagoo.Entities.TourGuides.TourGuideBooking", b =>
-                {
-                    b.HasOne("Voyagoo.Entities.TourGuides.TourGuide", "TourGuide")
-                        .WithMany("Bookings")
-                        .HasForeignKey("TourGuideId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Voyagoo.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("TourGuide");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Voyagoo.Entities.Restaurants.Feature", b =>
                 {
                     b.Navigation("RestaurantFeatures");
@@ -869,11 +817,6 @@ namespace Voyagoo.Persistence.Migrations
                     b.Navigation("Features");
 
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("Voyagoo.Entities.TourGuides.TourGuide", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

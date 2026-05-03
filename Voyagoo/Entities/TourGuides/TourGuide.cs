@@ -9,8 +9,10 @@
         public string Description { get; set; } = string.Empty;
         public double Rating { get; set; }
         public string? ProfilePictureUrl { get; set; }
+        public decimal PricePerDay { get; set; }
         public bool IsDeleted { get; set; } = false;
 
         public List<Language> Languages { get; set; } = [];
+        public List<TourGuideBooking> Bookings { get; set; } = [];
     }
 }

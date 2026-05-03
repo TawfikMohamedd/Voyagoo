@@ -63,6 +63,7 @@ namespace Voyagoo.Services
                 PhoneNumber = request.PhoneNumber,
                 Description = request.Description,
                 Rating = request.Rating,
+                PricePerDay = request.PricePerDay,
                 Languages = request.Languages.Select(l => (Language)l).ToList()
             };
 
@@ -123,6 +124,34 @@ namespace Voyagoo.Services
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
+        }
+
+        public async Task<Result<GetTourGuideDetailsResponse>> UpdateTourGuideAsync(int id,UpdateTourGuideRequest request,CancellationToken cancellationToken = default)
+        {
+            var guide = await _context.TourGuides
+                .FirstOrDefaultAsync(g => g.Id == id && !g.IsDeleted, cancellationToken);
+
+            if (guide is null)
+                return Result.Failure<GetTourGuideDetailsResponse>(TourGuideErrors.TourGuideNotFound);
+
+            // تأكد إن الـ email مش موجود عند حد تاني
+            var isDuplicate = await _context.TourGuides
+                .AnyAsync(g => g.Email == request.Email && g.Id != id && !g.IsDeleted, cancellationToken);
+
+            if (isDuplicate)
+                return Result.Failure<GetTourGuideDetailsResponse>(TourGuideErrors.DuplicateEmail);
+
+            guide.Name = request.Name;
+            guide.Email = request.Email;
+            guide.PhoneNumber = request.PhoneNumber;
+            guide.Description = request.Description;
+            guide.Rating = request.Rating;
+            guide.PricePerDay = request.PricePerDay;
+            guide.Languages = request.Languages.Select(l => (Language)l).ToList();
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success(guide.Adapt<GetTourGuideDetailsResponse>());
         }
 
         public IEnumerable<object> GetAllLanguages()

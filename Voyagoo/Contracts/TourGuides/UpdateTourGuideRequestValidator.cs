@@ -3,9 +3,9 @@ using Voyagoo.Entities.TourGuides;
 
 namespace Voyagoo.Contracts.TourGuides
 {
-    public class AddTourGuideRequestValidator : AbstractValidator<AddTourGuideRequest>
+    public class UpdateTourGuideRequestValidator : AbstractValidator<UpdateTourGuideRequest>
     {
-        public AddTourGuideRequestValidator()
+        public UpdateTourGuideRequestValidator()
         {
             RuleFor(x => x.Name)
                 .NotEmpty()
@@ -29,8 +29,8 @@ namespace Voyagoo.Contracts.TourGuides
                 .WithMessage("Rating must be between 1 and 5");
 
             RuleFor(x => x.PricePerDay)
-                 .GreaterThan(0)
-                 .WithMessage("Price per day must be greater than 0");
+                .GreaterThan(0)
+                .WithMessage("Price per day must be greater than 0");
 
             RuleFor(x => x.Languages)
                 .NotEmpty()
