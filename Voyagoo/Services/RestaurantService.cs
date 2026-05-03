@@ -264,5 +264,30 @@ namespace Voyagoo.Services
 
             return Result.Success(feature.Adapt<FeatureResponse>());
         }
+
+        public async Task<Result> DeleteRestaurantImageAsync(int restaurantId, int imageId, CancellationToken cancellationToken = default)
+        {
+            var restaurant = await _context.Restaurants
+                .Include(r => r.Images)
+                .FirstOrDefaultAsync(r => r.Id == restaurantId && !r.IsDeleted, cancellationToken);
+
+            if (restaurant is null)
+                return Result.Failure(RestaurantErrors.RestaurantNotFound);
+
+            var image = restaurant.Images.FirstOrDefault(i => i.Id == imageId);
+            if (image is null)
+                return Result.Failure(RestaurantErrors.ImageNotFound);
+
+            var path = Path.Combine(_webHostEnvironment.WebRootPath, image.ImageUrl.TrimStart('/'));
+            if (File.Exists(path)) File.Delete(path);
+
+            restaurant.Images.Remove(image);
+
+            if (image.IsMain && restaurant.Images.Count > 0)
+                restaurant.Images.First().IsMain = true;
+
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
     }
 }

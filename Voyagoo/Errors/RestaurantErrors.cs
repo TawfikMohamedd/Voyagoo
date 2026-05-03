@@ -18,5 +18,8 @@ namespace Voyagoo.Errors
 
         public static readonly Error NoMainImage =
             new("Restaurant.NoMainImage", "Restaurant must have at least one main image", StatusCodes.Status400BadRequest);
+        
+        public static readonly Error ImageNotFound =
+    new("Restaurant.ImageNotFound", "Image not found", StatusCodes.Status404NotFound);
     }
 }

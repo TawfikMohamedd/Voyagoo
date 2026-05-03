@@ -65,6 +65,13 @@ namespace Voyagoo.Controllers.Restaurants
             return Ok(types);
         }
 
+        [HttpDelete("{id}/images/{imageId}")]
+        public async Task<IActionResult> DeleteImage(int id, int imageId, CancellationToken cancellationToken)
+        {
+            var result = await _restaurantService.DeleteRestaurantImageAsync(id, imageId, cancellationToken);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
+
 
     }
 }

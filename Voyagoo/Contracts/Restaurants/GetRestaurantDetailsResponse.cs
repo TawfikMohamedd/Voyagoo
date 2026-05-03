@@ -9,9 +9,15 @@
         string CuisineType,        
         decimal MinPrice,           
         decimal MaxPrice,
-        List<string> ImageUrls,
+        List<RestaurantImageResponse> Images,
         List<FeatureResponse> Features,
         List<CommentResponse> Comments
+    );
+
+    public record RestaurantImageResponse(
+    int Id,
+    string ImageUrl,
+    bool IsMain
     );
 
     public record FeatureResponse(

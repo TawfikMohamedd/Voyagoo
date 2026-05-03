@@ -52,6 +52,9 @@ namespace Voyagoo
             services.AddScoped<ITourGuideService, TourGuideService>();
             services.AddScoped<ITourGuideBookingService, TourGuideBookingService>();
 
+            services.AddScoped<IAttractionService, AttractionService>();
+
+
 
 
             return services;

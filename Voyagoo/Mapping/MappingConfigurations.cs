@@ -1,8 +1,10 @@
 ﻿using Mapster;
+using Voyagoo.Contracts.Attractions;
 using Voyagoo.Contracts.Authentication.Register;
 using Voyagoo.Contracts.Restaurants;
 using Voyagoo.Contracts.TourGuides;
 using Voyagoo.Entities;
+using Voyagoo.Entities.Attractions;
 using Voyagoo.Entities.Restaurants;
 using Voyagoo.Entities.TourGuides;
 
@@ -23,18 +25,24 @@ namespace Voyagoo.Mapping
 
             config.NewConfig<Restaurant, GetRestaurantsResponse>()
                 .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
-    .Map(dest => dest.MainImageUrl,
-         src => src.Images.FirstOrDefault(i => i.IsMain) != null
-             ? src.Images.First(i => i.IsMain).ImageUrl
-             : src.Images.FirstOrDefault() != null
-             ? src.Images.First().ImageUrl
-             : null);
+                .Map(dest => dest.MainImageUrl,
+                  src => src.Images.FirstOrDefault(i => i.IsMain) != null
+                 ? src.Images.First(i => i.IsMain).ImageUrl
+                 : src.Images.FirstOrDefault() != null
+                 ? src.Images.First().ImageUrl
+                 : null);
 
             config.NewConfig<Restaurant, GetRestaurantDetailsResponse>()
-                .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
-                .Map(dest => dest.ImageUrls, src => src.Images.Select(i => i.ImageUrl).ToList())
-                .Map(dest => dest.Features, src => src.Features.Select(f => new FeatureResponse(f.FeatureId, f.Feature.Name, f.Feature.Icon)).ToList())
-                .Map(dest => dest.Comments, src => src.Comments.Select(c => new CommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.Content, c.Rating, c.CreatedAt)).ToList());
+            .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
+            .Map(dest => dest.Images, src => src.Images
+                .Select(i => new RestaurantImageResponse(i.Id, i.ImageUrl, i.IsMain))
+                .ToList())
+            .Map(dest => dest.Features, src => src.Features
+                .Select(f => new FeatureResponse(f.FeatureId, f.Feature.Name, f.Feature.Icon))
+                .ToList())
+            .Map(dest => dest.Comments, src => src.Comments
+                .Select(c => new CommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.Content, c.Rating, c.CreatedAt))
+                .ToList());
 
             config.NewConfig<AddRestaurantRequest, Restaurant>();
 
@@ -52,7 +60,23 @@ namespace Voyagoo.Mapping
             #endregion
 
 
+            #region Attractions
+            config.NewConfig<Attraction, GetAttractionsResponse>()
+              .Map(dest => dest.MainImageUrl,
+                    src => src.Images.FirstOrDefault(i => i.IsMain) != null
+                 ? src.Images.First(i => i.IsMain).ImageUrl
+                 : src.Images.FirstOrDefault() != null
+                 ? src.Images.First().ImageUrl
+                 : null);
 
+            config.NewConfig<Attraction, GetAttractionDetailsResponse>()
+                .Map(dest => dest.Images, src => src.Images
+                .Select(i => new AttractionImageResponse(i.Id, i.ImageUrl, i.IsMain))
+                .ToList());
+
+            config.NewConfig<AddAttractionRequest, Attraction>(); 
+
+            #endregion
 
         }
     }
