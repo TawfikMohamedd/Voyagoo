@@ -1,5 +1,6 @@
 ﻿using Voyagoo.Abstractions;
 using Voyagoo.Contracts.Attractions;
+using Voyagoo.Entities.Attractions;
 
 namespace Voyagoo.Services
 {
@@ -14,5 +15,8 @@ namespace Voyagoo.Services
         Task<Result<GetAttractionDetailsResponse>> UpdateAttractionAsync(int id, UpdateAttractionRequest request, CancellationToken cancellationToken = default);
 
         Task<Result> DeleteAttractionImageAsync(int attractionId, int imageId, CancellationToken cancellationToken = default);
+        Task<Result> UpdateAttractionStatusAsync(int id, AttractionStatus status, CancellationToken cancellationToken = default);
+        Task<Result<GetAttractionsAdminResponse>> GetAllAttractionsAdminAsync(CancellationToken cancellationToken = default);
+
     }
 }

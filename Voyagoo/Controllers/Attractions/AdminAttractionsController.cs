@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Voyagoo.Abstractions;
 using Voyagoo.Contracts.Attractions;
+using Voyagoo.Entities.Attractions;
 using Voyagoo.Services;
 
 namespace Voyagoo.Controllers.Attractions
@@ -50,6 +51,29 @@ namespace Voyagoo.Controllers.Attractions
         {
             var result = await _attractionService.DeleteAttractionImageAsync(id, imageId, cancellationToken);
             return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
+
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] AttractionStatus status, CancellationToken cancellationToken)
+        {
+            var result = await _attractionService.UpdateAttractionStatusAsync(id, status, cancellationToken);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
+
+        [HttpGet("statuses")]
+        public IActionResult GetStatuses()
+        {
+            var statuses = Enum.GetValues<AttractionStatus>()
+                .Select(s => new { id = (int)s, name = s.ToString() });
+
+            return Ok(statuses);
+        }
+
+        [HttpGet("GetAllAttractions")]
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        {
+            var result = await _attractionService.GetAllAttractionsAdminAsync(cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
     }
 }

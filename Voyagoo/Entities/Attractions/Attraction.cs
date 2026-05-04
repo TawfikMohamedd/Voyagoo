@@ -10,6 +10,7 @@
         public decimal TicketPrice { get; set; }
         public double Rating { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public AttractionStatus Status { get; set; } = AttractionStatus.Active;
 
         public List<AttractionImage> Images { get; set; } = [];
     }

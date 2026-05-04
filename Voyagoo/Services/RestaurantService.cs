@@ -22,7 +22,7 @@ namespace Voyagoo.Services
         public async Task<Result<List<GetRestaurantsResponse>>> GetAllRestaurantsAsync(CancellationToken cancellationToken = default)
         {
             var restaurants = await _context.Restaurants
-                .Where(r => !r.IsDeleted)
+                .Where(r => !r.IsDeleted && r.Status == RestaurantStatus.Active)
                 .Include(r => r.Images)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
@@ -35,7 +35,7 @@ namespace Voyagoo.Services
         public async Task<Result<GetRestaurantDetailsResponse>> GetRestaurantByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var restaurant = await _context.Restaurants
-                .Where(r => r.Id == id && !r.IsDeleted)
+                .Where(r => r.Id == id && !r.IsDeleted && r.Status == RestaurantStatus.Active)
                 .Include(r => r.Images)
                 .Include(r => r.Features)
                     .ThenInclude(f => f.Feature)
@@ -289,5 +289,36 @@ namespace Voyagoo.Services
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
+
+        public async Task<Result> UpdateRestaurantStatusAsync(int id, RestaurantStatus status, CancellationToken cancellationToken = default)
+        {
+            var restaurant = await _context.Restaurants
+                .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted, cancellationToken);
+
+            if (restaurant is null)
+                return Result.Failure(RestaurantErrors.RestaurantNotFound);
+
+            restaurant.Status = status;
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+
+        public async Task<Result<GetRestaurantsAdminResponse>> GetAllRestaurantsAdminAsync(CancellationToken cancellationToken = default)
+        {
+            var restaurants = await _context.Restaurants
+                .Where(r => !r.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var response = new GetRestaurantsAdminResponse(
+                TotalRestaurants: restaurants.Count,
+                ActiveRestaurants: restaurants.Count(r => r.Status == RestaurantStatus.Active),
+                InactiveRestaurants: restaurants.Count(r => r.Status == RestaurantStatus.Inactive),
+                Restaurants: restaurants.Adapt<List<RestaurantAdminItem>>()
+            );
+
+            return Result.Success(response);
+        }
+
     }
 }

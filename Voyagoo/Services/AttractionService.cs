@@ -18,7 +18,7 @@ namespace Voyagoo.Services
         public async Task<Result<List<GetAttractionsResponse>>> GetAllAttractionsAsync(CancellationToken cancellationToken = default)
         {
             var attractions = await _context.Attractions
-                .Where(a => !a.IsDeleted)
+                .Where(a => !a.IsDeleted && a.Status == AttractionStatus.Active)
                 .Include(a => a.Images)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
@@ -30,7 +30,7 @@ namespace Voyagoo.Services
         public async Task<Result<GetAttractionDetailsResponse>> GetAttractionByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var attraction = await _context.Attractions
-                .Where(a => a.Id == id && !a.IsDeleted)
+                .Where(a => a.Id == id && !a.IsDeleted && a.Status == AttractionStatus.Active)
                 .Include(a => a.Images)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
@@ -150,6 +150,36 @@ namespace Voyagoo.Services
 
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success();
+        }
+
+        public async Task<Result> UpdateAttractionStatusAsync(int id, AttractionStatus status, CancellationToken cancellationToken = default)
+        {
+            var attraction = await _context.Attractions
+                .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted, cancellationToken);
+
+            if (attraction is null)
+                return Result.Failure(AttractionErrors.AttractionNotFound);
+
+            attraction.Status = status;
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+
+        public async Task<Result<GetAttractionsAdminResponse>> GetAllAttractionsAdminAsync(CancellationToken cancellationToken = default)
+        {
+            var attractions = await _context.Attractions
+                .Where(a => !a.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var response = new GetAttractionsAdminResponse(
+                TotalAttractions: attractions.Count,
+                ActiveAttractions: attractions.Count(a => a.Status == AttractionStatus.Active),
+                InactiveAttractions: attractions.Count(a => a.Status == AttractionStatus.Inactive),
+                Attractions: attractions.Adapt<List<AttractionAdminItem>>()
+            );
+
+            return Result.Success(response);
         }
     }
 }

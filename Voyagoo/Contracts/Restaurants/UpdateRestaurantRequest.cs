@@ -13,6 +13,7 @@ namespace Voyagoo.Contracts.Restaurants
         int TablesForTwo,
         int TablesForFour,
         int TablesForSix,
+        RestaurantStatus Status,
         List<int> FeatureIds
     );
 }

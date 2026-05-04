@@ -17,7 +17,7 @@
         public int TablesForTwo { get; set; }
         public int TablesForFour { get; set; }
         public int TablesForSix { get; set; }
-
+        public RestaurantStatus Status { get; set; } = RestaurantStatus.Active;
         public List<RestaurantImage> Images { get; set; } = [];
         public List<RestaurantComment> Comments { get; set; } = [];
         public List<RestaurantFeature> Features { get; set; } = [];

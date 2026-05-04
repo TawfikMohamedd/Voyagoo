@@ -73,5 +73,31 @@ namespace Voyagoo.Controllers.Restaurants
         }
 
 
+
+
+
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] RestaurantStatus status, CancellationToken cancellationToken)
+        {
+            var result = await _restaurantService.UpdateRestaurantStatusAsync(id, status, cancellationToken);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
+
+        [HttpGet("statuses")]
+        public IActionResult GetStatuses()
+        {
+            var statuses = Enum.GetValues<RestaurantStatus>()
+                .Select(s => new { id = (int)s, name = s.ToString() });
+
+            return Ok(statuses);
+        }
+
+        [HttpGet("GetAllRestaurants")]
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        {
+            var result = await _restaurantService.GetAllRestaurantsAdminAsync(cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+
     }
 }

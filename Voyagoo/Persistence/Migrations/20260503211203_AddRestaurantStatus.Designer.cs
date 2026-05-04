@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503211203_AddRestaurantStatus")]
+    partial class AddRestaurantStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,7 +391,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPFAdnlC6Ufm6MXnHu+QBQ92z+/hS+0cvW8qL2p3Meh1ULTovMr7AkAIAjhQCYqRxQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIg15TJKkz2pP/cNO63/ks7zAjyXILv6b+s4Edt0tnnzK8wHwwx9J3qeTg2EFxkPxA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -427,9 +430,6 @@ namespace Voyagoo.Persistence.Migrations
 
                     b.Property<double>("Rating")
                         .HasColumnType("float");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("TicketPrice")
                         .HasColumnType("decimal(10,2)");

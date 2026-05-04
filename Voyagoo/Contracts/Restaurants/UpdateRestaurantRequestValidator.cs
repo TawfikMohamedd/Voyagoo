@@ -52,6 +52,10 @@ namespace Voyagoo.Contracts.Restaurants
 
             RuleFor(x => x.FeatureIds)
                 .NotNull();
+
+            RuleFor(x => x.Status)
+                .IsInEnum()
+                .WithMessage("Invalid status");
         }
     }
 }

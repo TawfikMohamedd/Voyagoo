@@ -48,6 +48,13 @@ namespace Voyagoo.Mapping
 
             config.NewConfig<AddFeatureRequest, Feature>();
 
+
+            config.NewConfig<Restaurant, RestaurantAdminItem>()
+                .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
+                .Map(dest => dest.Status, src => src.Status.ToString())
+                .Map(dest => dest.PriceRange, src => $"{src.MinPrice} - {src.MaxPrice} LE");
+
+
             #endregion
 
             #region TourGuide
@@ -74,7 +81,10 @@ namespace Voyagoo.Mapping
                 .Select(i => new AttractionImageResponse(i.Id, i.ImageUrl, i.IsMain))
                 .ToList());
 
-            config.NewConfig<AddAttractionRequest, Attraction>(); 
+            config.NewConfig<AddAttractionRequest, Attraction>();
+
+            config.NewConfig<Attraction, AttractionAdminItem>()
+                .Map(dest => dest.Status, src => src.Status.ToString());
 
             #endregion
 

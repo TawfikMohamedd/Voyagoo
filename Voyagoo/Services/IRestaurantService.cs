@@ -1,5 +1,6 @@
 ﻿using Voyagoo.Abstractions;
 using Voyagoo.Contracts.Restaurants;
+using Voyagoo.Entities.Restaurants;
 
 namespace Voyagoo.Services
 {
@@ -21,5 +22,8 @@ namespace Voyagoo.Services
         Task<Result<List<FeatureResponse>>> GetAllFeaturesAsync(CancellationToken cancellationToken = default);
         Task<Result<FeatureResponse>> AddFeatureAsync(AddFeatureRequest request, CancellationToken cancellationToken = default);
         Task<Result> DeleteRestaurantImageAsync(int restaurantId, int imageId, CancellationToken cancellationToken = default);
+        Task<Result> UpdateRestaurantStatusAsync(int id, RestaurantStatus status, CancellationToken cancellationToken = default);
+
+        Task<Result<GetRestaurantsAdminResponse>> GetAllRestaurantsAdminAsync(CancellationToken cancellationToken = default);
     }
 }
