@@ -250,7 +250,7 @@ namespace Voyagoo.Services
 
         public async Task<Result<FeatureResponse>> AddFeatureAsync(AddFeatureRequest request, CancellationToken cancellationToken = default)
         {
-            // تأكد مفيش feature بنفس الاسم
+            
             var isDuplicate = await _context.Features
                 .AnyAsync(f => f.Name == request.Name, cancellationToken);
 

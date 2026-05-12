@@ -63,6 +63,9 @@ namespace Voyagoo.Mapping
 
             config.NewConfig<TourGuide, GetTourGuideDetailsResponse>()
                 .Map(dest => dest.Languages, src => src.Languages.Select(l => l.ToString()).ToList());
+           
+            config.NewConfig<TourGuide, TourGuideAdminItem>()
+                .Map(dest => dest.Status, src => src.Status.ToString());
 
             #endregion
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Voyagoo.Abstractions;
 using Voyagoo.Contracts.TourGuides;
+using Voyagoo.Entities.TourGuides;
 using Voyagoo.Services;
 
 namespace Voyagoo.Controllers.TourGuides
@@ -52,6 +53,29 @@ namespace Voyagoo.Controllers.TourGuides
             CancellationToken cancellationToken)
         {
             var result = await _tourGuideService.UpdateTourGuideAsync(id, request, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] TourGuideStatus status, CancellationToken cancellationToken)
+        {
+            var result = await _tourGuideService.UpdateTourGuideStatusAsync(id, status, cancellationToken);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
+
+        [HttpGet("statuses")]
+        public IActionResult GetStatuses()
+        {
+            var statuses = Enum.GetValues<TourGuideStatus>()
+                .Select(s => new { id = (int)s, name = s.ToString() });
+
+            return Ok(statuses);
+        }
+
+        [HttpGet("GetAllTourGuides")]
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        {
+            var result = await _tourGuideService.GetAllTourGuidesAdminAsync(cancellationToken);
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
     }

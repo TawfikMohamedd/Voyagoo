@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260511183139_AddTourGuideStatus")]
+    partial class AddTourGuideStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -388,7 +391,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJQhaaNVP5sgBngFLZ/AUUTsvEq3cwvzBr0FqP6mQkUGM+q544JCLSQjReHTNqcmkA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELBOfACpIoVSizaJWCvNEQdtY0E3826wNJscW08CWYv/GIlJlUmJlE8akujZR4MzNw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -462,53 +465,6 @@ namespace Voyagoo.Persistence.Migrations
                     b.HasIndex("AttractionId");
 
                     b.ToTable("AttractionImages");
-                });
-
-            modelBuilder.Entity("Voyagoo.Entities.Favorites.Favorite", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AttractionId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("RestaurantId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TourGuideId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttractionId");
-
-                    b.HasIndex("RestaurantId");
-
-                    b.HasIndex("TourGuideId");
-
-                    b.HasIndex("UserId", "AttractionId")
-                        .IsUnique()
-                        .HasFilter("[AttractionId] IS NOT NULL");
-
-                    b.HasIndex("UserId", "RestaurantId")
-                        .IsUnique()
-                        .HasFilter("[RestaurantId] IS NOT NULL");
-
-                    b.HasIndex("UserId", "TourGuideId")
-                        .IsUnique()
-                        .HasFilter("[TourGuideId] IS NOT NULL");
-
-                    b.ToTable("Favorites");
                 });
 
             modelBuilder.Entity("Voyagoo.Entities.Restaurants.Booking", b =>
@@ -900,38 +856,6 @@ namespace Voyagoo.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Attraction");
-                });
-
-            modelBuilder.Entity("Voyagoo.Entities.Favorites.Favorite", b =>
-                {
-                    b.HasOne("Voyagoo.Entities.Attractions.Attraction", "Attraction")
-                        .WithMany()
-                        .HasForeignKey("AttractionId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Voyagoo.Entities.Restaurants.Restaurant", "Restaurant")
-                        .WithMany()
-                        .HasForeignKey("RestaurantId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Voyagoo.Entities.TourGuides.TourGuide", "TourGuide")
-                        .WithMany()
-                        .HasForeignKey("TourGuideId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Voyagoo.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Attraction");
-
-                    b.Navigation("Restaurant");
-
-                    b.Navigation("TourGuide");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Voyagoo.Entities.Restaurants.Booking", b =>

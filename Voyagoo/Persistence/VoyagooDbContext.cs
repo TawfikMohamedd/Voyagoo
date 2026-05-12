@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using Voyagoo.Entities;
 using Voyagoo.Entities.Attractions;
+using Voyagoo.Entities.Favorites;
 using Voyagoo.Entities.Restaurants;
 using Voyagoo.Entities.TourGuides;
 
@@ -32,6 +33,7 @@ namespace Voyagoo.Persistence
 
         public DbSet<Attraction> Attractions { get; set; }
         public DbSet<AttractionImage> AttractionImages { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
 
     }
 }

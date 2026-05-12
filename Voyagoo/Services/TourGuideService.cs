@@ -22,7 +22,7 @@ namespace Voyagoo.Services
         public async Task<Result<List<GetTourGuidesResponse>>> GetAllTourGuidesAsync(CancellationToken cancellationToken = default)
         {
             var guides = await _context.TourGuides
-                .Where(g => !g.IsDeleted)
+                .Where(g => !g.IsDeleted && g.Status == TourGuideStatus.Active)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
@@ -33,7 +33,7 @@ namespace Voyagoo.Services
         public async Task<Result<GetTourGuideDetailsResponse>> GetTourGuideByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             var guide = await _context.TourGuides
-                .Where(g => g.Id == id && !g.IsDeleted)
+                .Where(g => g.Id == id && !g.IsDeleted && g.Status == TourGuideStatus.Active)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -158,6 +158,55 @@ namespace Voyagoo.Services
         {
             return Enum.GetValues<Language>()
                 .Select(l => new { id = (int)l, name = l.ToString() });
+        }
+
+        public async Task<Result> UpdateTourGuideStatusAsync(int id, TourGuideStatus status, CancellationToken cancellationToken = default)
+        {
+            var guide = await _context.TourGuides
+                .FirstOrDefaultAsync(g => g.Id == id && !g.IsDeleted, cancellationToken);
+
+            if (guide is null)
+                return Result.Failure(TourGuideErrors.TourGuideNotFound);
+
+            guide.Status = status;
+            await _context.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+        }
+
+        public async Task<Result<GetTourGuidesAdminResponse>> GetAllTourGuidesAdminAsync(CancellationToken cancellationToken = default)
+        {
+            var guides = await _context.TourGuides
+        .Where(g => !g.IsDeleted)
+        .AsNoTracking()
+        .ToListAsync(cancellationToken);
+
+            var items = guides.Select(g =>
+            {
+                var languageNames = g.Languages.Select(l => l.ToString()).ToList();
+
+                var languagesDisplay = languageNames.Count <= 2
+                    ? string.Join(", ", languageNames)
+                    : string.Join(", ", languageNames.Take(2)) + $" +{languageNames.Count - 2}";
+
+                return new TourGuideAdminItem(
+                    Id: g.Id,
+                    Name: g.Name,
+                    Email: g.Email,
+                    PhoneNumber: g.PhoneNumber,
+                    Languages: languagesDisplay,
+                    Rating: g.Rating,
+                    Status: g.Status.ToString()
+                );
+            }).ToList();
+
+            var response = new GetTourGuidesAdminResponse(
+                TotalTourGuides: guides.Count,
+                ActiveTourGuides: guides.Count(g => g.Status == TourGuideStatus.Active),
+                InactiveTourGuides: guides.Count(g => g.Status == TourGuideStatus.Inactive),
+                TourGuides: items
+            );
+
+            return Result.Success(response);
         }
     }
 }

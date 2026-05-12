@@ -11,6 +11,7 @@
         public string? ProfilePictureUrl { get; set; }
         public decimal PricePerDay { get; set; }
         public bool IsDeleted { get; set; } = false;
+        public TourGuideStatus Status { get; set; } = TourGuideStatus.Active;
 
         public List<Language> Languages { get; set; } = [];
         public List<TourGuideBooking> Bookings { get; set; } = [];
