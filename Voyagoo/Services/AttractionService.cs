@@ -110,10 +110,11 @@ namespace Voyagoo.Services
 
             attraction.Name = request.Name;
             attraction.Description = request.Description;
-            attraction.Place = request.Place;
-            attraction.DateOfInscription = request.DateOfInscription;
+            attraction.Location = request.Location;
+            attraction.YearOfInscription = request.YearOfInscription;
             attraction.TicketPrice = request.TicketPrice;
             attraction.Rating = request.Rating;
+            attraction.Category = request.Category;
 
             await _context.SaveChangesAsync(cancellationToken);
             return Result.Success(attraction.Adapt<GetAttractionDetailsResponse>());
@@ -161,6 +162,7 @@ namespace Voyagoo.Services
         {
             var attractions = await _context.Attractions
                 .Where(a => !a.IsDeleted)
+                .Include(a => a.Images)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 

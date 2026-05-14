@@ -1,11 +1,14 @@
-﻿namespace Voyagoo.Contracts.Attractions
+﻿using Voyagoo.Entities.Attractions;
+
+namespace Voyagoo.Contracts.Attractions
 {
     public record UpdateAttractionRequest(
         string Name,
         string Description,
-        string Place,
-        DateOnly DateOfInscription,
+        string Location,
+        int YearOfInscription,
         decimal TicketPrice,
-        double Rating
+        double Rating,
+        AttractionCategory Category
     );
 }

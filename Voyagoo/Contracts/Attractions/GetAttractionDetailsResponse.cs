@@ -4,10 +4,11 @@
         int Id,
         string Name,
         string Description,
-        string Place,
-        DateOnly DateOfInscription,
+        string Location,
+        int YearOfInscription,
         decimal TicketPrice,
         double Rating,
+        string Category,
         List<AttractionImageResponse> Images
     );
 

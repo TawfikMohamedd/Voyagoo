@@ -174,7 +174,8 @@ namespace Voyagoo.Services
                     PhoneNumber: g.PhoneNumber,
                     Languages: languagesDisplay,
                     Rating: g.Rating,
-                    Status: g.Status.ToString()
+                    Status: g.Status.ToString(),
+                    ProfilePictureUrl: g.ProfilePictureUrl
                 );
             }).ToList();
 

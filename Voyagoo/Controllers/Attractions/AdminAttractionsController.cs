@@ -75,5 +75,14 @@ namespace Voyagoo.Controllers.Attractions
             var result = await _attractionService.GetAllAttractionsAdminAsync(cancellationToken);
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
+
+        [HttpGet("Get All categories")]
+        public IActionResult GetCategories()
+        {
+            var categories = Enum.GetValues<AttractionCategory>()
+                .Select(c => new { id = (int)c, name = c.ToString() });
+
+            return Ok(categories);
+        }
     }
 }

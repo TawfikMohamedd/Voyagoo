@@ -12,7 +12,7 @@ namespace Voyagoo.Persistence.EntitiesConfigurations.Attractions
 
             builder.Property(x => x.Name).HasMaxLength(200).IsRequired();
             builder.Property(x => x.Description).HasMaxLength(2000).IsRequired();
-            builder.Property(x => x.Place).HasMaxLength(300).IsRequired();
+            builder.Property(x => x.Location).HasMaxLength(300).IsRequired();
             builder.Property(x => x.TicketPrice).HasColumnType("decimal(10,2)");
 
             builder.HasMany(x => x.Images)

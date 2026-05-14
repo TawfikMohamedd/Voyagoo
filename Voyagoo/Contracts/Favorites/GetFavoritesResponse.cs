@@ -24,7 +24,7 @@
     public record FavoriteAttractionItem(
         int Id,
         string Name,
-        string Place,
+        string Location,
         double Rating,
         string? MainImageUrl
     );

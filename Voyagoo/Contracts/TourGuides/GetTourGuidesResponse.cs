@@ -5,6 +5,7 @@
         string Name,
         string Description,
         double Rating,
+        decimal PricePerDay,
         string? ProfilePictureUrl
     );
 }

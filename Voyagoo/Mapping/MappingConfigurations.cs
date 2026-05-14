@@ -72,7 +72,8 @@ namespace Voyagoo.Mapping
 
             #region Attractions
             config.NewConfig<Attraction, GetAttractionsResponse>()
-              .Map(dest => dest.MainImageUrl,
+                .Map(dest => dest.Category, src => src.Category.ToString())
+                .Map(dest => dest.MainImageUrl,
                     src => src.Images.FirstOrDefault(i => i.IsMain) != null
                  ? src.Images.First(i => i.IsMain).ImageUrl
                  : src.Images.FirstOrDefault() != null
@@ -80,6 +81,7 @@ namespace Voyagoo.Mapping
                  : null);
 
             config.NewConfig<Attraction, GetAttractionDetailsResponse>()
+                .Map(dest => dest.Category, src => src.Category.ToString())
                 .Map(dest => dest.Images, src => src.Images
                 .Select(i => new AttractionImageResponse(i.Id, i.ImageUrl, i.IsMain))
                 .ToList());
@@ -87,7 +89,14 @@ namespace Voyagoo.Mapping
             config.NewConfig<AddAttractionRequest, Attraction>();
 
             config.NewConfig<Attraction, AttractionAdminItem>()
-                .Map(dest => dest.Status, src => src.Status.ToString());
+                .Map(dest => dest.Category, src => src.Category.ToString())
+                .Map(dest => dest.Status, src => src.Status.ToString())
+                .Map(dest => dest.MainImageUrl,     
+                    src => src.Images.FirstOrDefault(i => i.IsMain) != null
+                    ? src.Images.First(i => i.IsMain).ImageUrl
+                    : src.Images.FirstOrDefault() != null
+                    ? src.Images.First().ImageUrl
+                    : null);
 
             #endregion
 

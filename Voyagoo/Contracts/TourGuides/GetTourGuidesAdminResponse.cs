@@ -14,6 +14,7 @@
         string PhoneNumber,
         string Languages,
         double Rating,
-        string Status
+        string Status,
+        string? ProfilePictureUrl
     );
 }

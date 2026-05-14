@@ -14,14 +14,14 @@ namespace Voyagoo.Contracts.Attractions
                 .NotEmpty()
                 .Length(10, 2000);
 
-            RuleFor(x => x.Place)
+            RuleFor(x => x.Location)
                 .NotEmpty()
                 .Length(3, 300);
 
-            RuleFor(x => x.DateOfInscription)
-                .NotEmpty()
-                .LessThan(DateOnly.FromDateTime(DateTime.UtcNow))
-                .WithMessage("Date of inscription must be in the past");
+            RuleFor(x => x.YearOfInscription)
+                .GreaterThan(0)
+                .LessThan(DateTime.UtcNow.Year + 1)
+                .WithMessage("Year of inscription must be a valid past year");
 
             RuleFor(x => x.TicketPrice)
                 .GreaterThanOrEqualTo(0)
@@ -30,6 +30,10 @@ namespace Voyagoo.Contracts.Attractions
             RuleFor(x => x.Rating)
                 .InclusiveBetween(1.0, 5.0)
                 .WithMessage("Rating must be between 1 and 5");
+
+            RuleFor(x => x.Category)
+                .IsInEnum()
+                .WithMessage("Invalid category");
         }
     }
 }

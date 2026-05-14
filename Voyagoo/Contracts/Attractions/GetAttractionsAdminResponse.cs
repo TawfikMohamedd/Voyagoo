@@ -10,9 +10,11 @@
     public record AttractionAdminItem(
         int Id,
         string Name,
-        string Place,
+        string Location,
         double Rating,
         decimal TicketPrice,
-        string Status
+        string Category,
+        string Status,
+        string? MainImageUrl
     );
 }

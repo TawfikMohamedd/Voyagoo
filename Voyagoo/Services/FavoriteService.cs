@@ -100,7 +100,7 @@ namespace Voyagoo.Services
                 .Select(f => new FavoriteAttractionItem(
                     Id: f.Attraction!.Id,
                     Name: f.Attraction.Name,
-                    Place: f.Attraction.Place,
+                    Location: f.Attraction.Location,
                     Rating: f.Attraction.Rating,
                     MainImageUrl: f.Attraction.Images.FirstOrDefault(i => i.IsMain)?.ImageUrl
                         ?? f.Attraction.Images.FirstOrDefault()?.ImageUrl

@@ -5,6 +5,7 @@
         string Name,
         string Description,
         double Rating,
+        string Category,
         string? MainImageUrl
     );
 }
