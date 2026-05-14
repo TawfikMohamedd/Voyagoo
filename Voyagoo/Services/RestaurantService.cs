@@ -10,10 +10,10 @@ namespace Voyagoo.Services
 {
     public class RestaurantService(
         VoyagooDbContext context,
-        IWebHostEnvironment webHostEnvironment) : IRestaurantService
+        IImageService imageService) : IRestaurantService
     {
         private readonly VoyagooDbContext _context = context;
-        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
+        private readonly IImageService _imageService = imageService;
 
         // ─────────────────────────────────────────────
         // PUBLIC
@@ -27,9 +27,7 @@ namespace Voyagoo.Services
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            var response = restaurants.Adapt<List<GetRestaurantsResponse>>();
-
-            return Result.Success(response);
+            return Result.Success(restaurants.Adapt<List<GetRestaurantsResponse>>());
         }
 
         public async Task<Result<GetRestaurantDetailsResponse>> GetRestaurantByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -37,19 +35,15 @@ namespace Voyagoo.Services
             var restaurant = await _context.Restaurants
                 .Where(r => r.Id == id && !r.IsDeleted && r.Status == RestaurantStatus.Active)
                 .Include(r => r.Images)
-                .Include(r => r.Features)
-                    .ThenInclude(f => f.Feature)
-                .Include(r => r.Comments)
-                    .ThenInclude(c => c.User)
+                .Include(r => r.Features).ThenInclude(f => f.Feature)
+                .Include(r => r.Comments).ThenInclude(c => c.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (restaurant is null)
                 return Result.Failure<GetRestaurantDetailsResponse>(RestaurantErrors.RestaurantNotFound);
 
-            var response = restaurant.Adapt<GetRestaurantDetailsResponse>();
-
-            return Result.Success(response);
+            return Result.Success(restaurant.Adapt<GetRestaurantDetailsResponse>());
         }
 
         public async Task<Result> AddCommentAsync(int restaurantId, string userId, AddCommentRequest request, CancellationToken cancellationToken = default)
@@ -81,7 +75,6 @@ namespace Voyagoo.Services
 
         public async Task<Result<GetRestaurantDetailsResponse>> AddRestaurantAsync(AddRestaurantRequest request, CancellationToken cancellationToken = default)
         {
-            // تأكد إن الـ FeatureIds موجودة في الـ DB
             var featuresExist = await _context.Features
                 .Where(f => request.FeatureIds.Contains(f.Id))
                 .CountAsync(cancellationToken);
@@ -99,14 +92,11 @@ namespace Voyagoo.Services
             await _context.Restaurants.AddAsync(restaurant, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-            // Reload مع الـ Features عشان نرجع Response كامل
             var created = await _context.Restaurants
                 .Where(r => r.Id == restaurant.Id)
                 .Include(r => r.Images)
-                .Include(r => r.Features)
-                    .ThenInclude(f => f.Feature)
-                .Include(r => r.Comments)
-                    .ThenInclude(c => c.User)
+                .Include(r => r.Features).ThenInclude(f => f.Feature)
+                .Include(r => r.Comments).ThenInclude(c => c.User)
                 .AsNoTracking()
                 .FirstAsync(cancellationToken);
 
@@ -122,9 +112,7 @@ namespace Voyagoo.Services
             if (restaurant is null)
                 return Result.Failure(RestaurantErrors.RestaurantNotFound);
 
-            // تحديد لو في main image موجودة خلاص
             var hasMainImage = restaurant.Images.Any(i => i.IsMain);
-
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
 
             foreach (var image in images)
@@ -134,31 +122,20 @@ namespace Voyagoo.Services
                 if (!allowedExtensions.Contains(extension))
                     return Result.Failure(RestaurantErrors.InvalidImageFile);
 
-                // حفظ الصورة لوكال
-                var fileName = $"{Guid.NewGuid()}{extension}";
-                var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "restaurants");
+                // رفع على Cloudinary
+                var imageUrl = await _imageService.UploadImageAsync(image, "voyagoo/restaurants", cancellationToken);
 
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                var filePath = Path.Combine(folderPath, fileName);
-
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await image.CopyToAsync(stream, cancellationToken);
-
-                // أول صورة تتحط تبقى main لو مفيش main
                 var isMain = !hasMainImage;
                 hasMainImage = true;
 
                 restaurant.Images.Add(new RestaurantImage
                 {
-                    ImageUrl = $"/images/restaurants/{fileName}",
+                    ImageUrl = imageUrl,
                     IsMain = isMain
                 });
             }
 
             await _context.SaveChangesAsync(cancellationToken);
-
             return Result.Success();
         }
 
@@ -170,27 +147,23 @@ namespace Voyagoo.Services
             if (restaurant is null)
                 return Result.Failure(RestaurantErrors.RestaurantNotFound);
 
-            // Soft Delete
             restaurant.IsDeleted = true;
-
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }
 
-        public async Task<Result<GetRestaurantDetailsResponse>> UpdateRestaurantAsync(int id,UpdateRestaurantRequest request,CancellationToken cancellationToken = default)
+        public async Task<Result<GetRestaurantDetailsResponse>> UpdateRestaurantAsync(int id, UpdateRestaurantRequest request, CancellationToken cancellationToken = default)
         {
             var restaurant = await _context.Restaurants
                 .Include(r => r.Features)
                 .Include(r => r.Images)
-                .Include(r => r.Comments)
-                    .ThenInclude(c => c.User)
+                .Include(r => r.Comments).ThenInclude(c => c.User)
                 .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted, cancellationToken);
 
             if (restaurant is null)
                 return Result.Failure<GetRestaurantDetailsResponse>(RestaurantErrors.RestaurantNotFound);
 
-            // تأكد إن الـ FeatureIds موجودة في الـ DB
             var featuresExist = await _context.Features
                 .Where(f => request.FeatureIds.Contains(f.Id))
                 .CountAsync(cancellationToken);
@@ -198,7 +171,6 @@ namespace Voyagoo.Services
             if (featuresExist != request.FeatureIds.Count)
                 return Result.Failure<GetRestaurantDetailsResponse>(RestaurantErrors.FeatureNotFound);
 
-            // update البيانات الأساسية
             restaurant.Name = request.Name;
             restaurant.Description = request.Description;
             restaurant.Address = request.Address;
@@ -210,7 +182,6 @@ namespace Voyagoo.Services
             restaurant.TablesForFour = request.TablesForFour;
             restaurant.TablesForSix = request.TablesForSix;
 
-            // update الـ Features
             restaurant.Features = request.FeatureIds.Select(fId => new RestaurantFeature
             {
                 RestaurantId = id,
@@ -219,50 +190,15 @@ namespace Voyagoo.Services
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            // Reload عشان نرجع الـ Features محملة
             var updated = await _context.Restaurants
                 .Where(r => r.Id == id)
                 .Include(r => r.Images)
-                .Include(r => r.Features)
-                    .ThenInclude(f => f.Feature)
-                .Include(r => r.Comments)
-                    .ThenInclude(c => c.User)
+                .Include(r => r.Features).ThenInclude(f => f.Feature)
+                .Include(r => r.Comments).ThenInclude(c => c.User)
                 .AsNoTracking()
                 .FirstAsync(cancellationToken);
 
             return Result.Success(updated.Adapt<GetRestaurantDetailsResponse>());
-        }
-
-        // ─────────────────────────────────────────────
-        // ADMIN - FEATURES
-        // ─────────────────────────────────────────────
-
-        public async Task<Result<List<FeatureResponse>>> GetAllFeaturesAsync(CancellationToken cancellationToken = default)
-        {
-            var features = await _context.Features
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-
-            var response = features.Adapt<List<FeatureResponse>>();
-
-            return Result.Success(response);
-        }
-
-        public async Task<Result<FeatureResponse>> AddFeatureAsync(AddFeatureRequest request, CancellationToken cancellationToken = default)
-        {
-            
-            var isDuplicate = await _context.Features
-                .AnyAsync(f => f.Name == request.Name, cancellationToken);
-
-            if (isDuplicate)
-                return Result.Failure<FeatureResponse>(RestaurantErrors.DuplicateFeature);
-
-            var feature = request.Adapt<Feature>();
-
-            await _context.Features.AddAsync(feature, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return Result.Success(feature.Adapt<FeatureResponse>());
         }
 
         public async Task<Result> DeleteRestaurantImageAsync(int restaurantId, int imageId, CancellationToken cancellationToken = default)
@@ -278,8 +214,8 @@ namespace Voyagoo.Services
             if (image is null)
                 return Result.Failure(RestaurantErrors.ImageNotFound);
 
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, image.ImageUrl.TrimStart('/'));
-            if (File.Exists(path)) File.Delete(path);
+            // حذف من Cloudinary
+            await _imageService.DeleteImageAsync(image.ImageUrl);
 
             restaurant.Images.Remove(image);
 
@@ -320,5 +256,33 @@ namespace Voyagoo.Services
             return Result.Success(response);
         }
 
+        // ─────────────────────────────────────────────
+        // ADMIN - FEATURES
+        // ─────────────────────────────────────────────
+
+        public async Task<Result<List<FeatureResponse>>> GetAllFeaturesAsync(CancellationToken cancellationToken = default)
+        {
+            var features = await _context.Features
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            return Result.Success(features.Adapt<List<FeatureResponse>>());
+        }
+
+        public async Task<Result<FeatureResponse>> AddFeatureAsync(AddFeatureRequest request, CancellationToken cancellationToken = default)
+        {
+            var isDuplicate = await _context.Features
+                .AnyAsync(f => f.Name == request.Name, cancellationToken);
+
+            if (isDuplicate)
+                return Result.Failure<FeatureResponse>(RestaurantErrors.DuplicateFeature);
+
+            var feature = request.Adapt<Feature>();
+
+            await _context.Features.AddAsync(feature, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success(feature.Adapt<FeatureResponse>());
+        }
     }
 }

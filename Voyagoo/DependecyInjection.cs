@@ -55,10 +55,14 @@ namespace Voyagoo
             services.AddScoped<IAttractionService, AttractionService>();
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IFavoriteService, FavoriteService>();
+            services.AddScoped<IImageService, CloudinaryImageService>();
 
 
 
-
+            services.AddOptions<CloudinarySettings>()
+                    .BindConfiguration(CloudinarySettings.SectionName)
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
 
             return services;
 

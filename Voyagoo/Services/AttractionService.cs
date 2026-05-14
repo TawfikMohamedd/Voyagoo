@@ -10,10 +10,10 @@ namespace Voyagoo.Services
 {
     public class AttractionService(
         VoyagooDbContext context,
-        IWebHostEnvironment webHostEnvironment) : IAttractionService
+        IImageService imageService) : IAttractionService
     {
         private readonly VoyagooDbContext _context = context;
-        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
+        private readonly IImageService _imageService = imageService;
 
         public async Task<Result<List<GetAttractionsResponse>>> GetAllAttractionsAsync(CancellationToken cancellationToken = default)
         {
@@ -23,8 +23,7 @@ namespace Voyagoo.Services
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            var response = attractions.Adapt<List<GetAttractionsResponse>>();
-            return Result.Success(response);
+            return Result.Success(attractions.Adapt<List<GetAttractionsResponse>>());
         }
 
         public async Task<Result<GetAttractionDetailsResponse>> GetAttractionByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -70,22 +69,15 @@ namespace Voyagoo.Services
                 if (!allowedExtensions.Contains(extension))
                     return Result.Failure(AttractionErrors.InvalidImageFile);
 
-                var fileName = $"{Guid.NewGuid()}{extension}";
-                var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "attractions");
-
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                var filePath = Path.Combine(folderPath, fileName);
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await image.CopyToAsync(stream, cancellationToken);
+                // رفع على Cloudinary
+                var imageUrl = await _imageService.UploadImageAsync(image, "voyagoo/attractions", cancellationToken);
 
                 var isMain = !hasMainImage;
                 hasMainImage = true;
 
                 attraction.Images.Add(new AttractionImage
                 {
-                    ImageUrl = $"/images/attractions/{fileName}",
+                    ImageUrl = imageUrl,
                     IsMain = isMain
                 });
             }
@@ -140,8 +132,8 @@ namespace Voyagoo.Services
             if (image is null)
                 return Result.Failure(AttractionErrors.ImageNotFound);
 
-            var path = Path.Combine(_webHostEnvironment.WebRootPath, image.ImageUrl.TrimStart('/'));
-            if (File.Exists(path)) File.Delete(path);
+            // حذف من Cloudinary
+            await _imageService.DeleteImageAsync(image.ImageUrl);
 
             attraction.Images.Remove(image);
 

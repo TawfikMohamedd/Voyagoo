@@ -6,11 +6,12 @@ using Voyagoo.Errors;
 
 namespace Voyagoo.Services
 {
-    public class AccountService(UserManager<ApplicationUser> userManager,
-    IWebHostEnvironment webHostEnvironment) : IAccountService
+    public class AccountService(
+        UserManager<ApplicationUser> userManager,
+        IImageService imageService) : IAccountService
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
+        private readonly IImageService _imageService = imageService;
 
         public async Task<Result<GetProfileResponse>> GetProfileAsync(string userId, CancellationToken cancellationToken = default)
         {
@@ -20,7 +21,6 @@ namespace Voyagoo.Services
                 return Result.Failure<GetProfileResponse>(UserErrors.EmailNotFound);
 
             var response = new GetProfileResponse(
-                
                 user.FirstName,
                 user.LastName,
                 user.Email!,
@@ -30,7 +30,6 @@ namespace Voyagoo.Services
 
             return Result.Success(response);
         }
-
 
         public async Task<Result> UpdateProfileAsync(string userId, UpdateProfileRequest request, CancellationToken cancellationToken = default)
         {
@@ -61,35 +60,20 @@ namespace Voyagoo.Services
             if (user is null)
                 return Result.Failure<string>(UserErrors.EmailNotFound);
 
-            // التحقق من نوع الملف
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
             var extension = Path.GetExtension(image.FileName).ToLower();
 
             if (!allowedExtensions.Contains(extension))
                 return Result.Failure<string>(UserErrors.InvalidImageFile);
 
-            // حذف الصورة القديمة لو موجودة
+            // حذف الصورة القديمة من Cloudinary لو موجودة
             if (!string.IsNullOrEmpty(user.ProfilePictureUrl))
-            {
-                var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, user.ProfilePictureUrl.TrimStart('/'));
-                if (File.Exists(oldPath))
-                    File.Delete(oldPath);
-            }
+                await _imageService.DeleteImageAsync(user.ProfilePictureUrl);
 
-            // حفظ الصورة الجديدة
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "users");
+            // رفع الصورة الجديدة على Cloudinary
+            var imageUrl = await _imageService.UploadImageAsync(image, "voyagoo/users", cancellationToken);
 
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            var filePath = Path.Combine(folderPath, fileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await image.CopyToAsync(stream, cancellationToken);
-
-            // تحديث الـ URL في الـ DB
-            user.ProfilePictureUrl = $"/images/users/{fileName}";
+            user.ProfilePictureUrl = imageUrl;
 
             var result = await _userManager.UpdateAsync(user);
 

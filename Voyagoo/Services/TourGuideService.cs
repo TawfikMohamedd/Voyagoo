@@ -10,10 +10,10 @@ namespace Voyagoo.Services
 {
     public class TourGuideService(
         VoyagooDbContext context,
-        IWebHostEnvironment webHostEnvironment) : ITourGuideService
+        IImageService imageService) : ITourGuideService
     {
         private readonly VoyagooDbContext _context = context;
-        private readonly IWebHostEnvironment _webHostEnvironment = webHostEnvironment;
+        private readonly IImageService _imageService = imageService;
 
         // ─────────────────────────────────────────────
         // PUBLIC
@@ -26,8 +26,7 @@ namespace Voyagoo.Services
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
-            var response = guides.Adapt<List<GetTourGuidesResponse>>();
-            return Result.Success(response);
+            return Result.Success(guides.Adapt<List<GetTourGuidesResponse>>());
         }
 
         public async Task<Result<GetTourGuideDetailsResponse>> GetTourGuideByIdAsync(int id, CancellationToken cancellationToken = default)
@@ -40,8 +39,7 @@ namespace Voyagoo.Services
             if (guide is null)
                 return Result.Failure<GetTourGuideDetailsResponse>(TourGuideErrors.TourGuideNotFound);
 
-            var response = guide.Adapt<GetTourGuideDetailsResponse>();
-            return Result.Success(response);
+            return Result.Success(guide.Adapt<GetTourGuideDetailsResponse>());
         }
 
         // ─────────────────────────────────────────────
@@ -87,26 +85,14 @@ namespace Voyagoo.Services
             if (!allowedExtensions.Contains(extension))
                 return Result.Failure(TourGuideErrors.InvalidImageFile);
 
-            // حذف الصورة القديمة لو موجودة
+            // حذف الصورة القديمة من Cloudinary لو موجودة
             if (!string.IsNullOrEmpty(guide.ProfilePictureUrl))
-            {
-                var oldPath = Path.Combine(_webHostEnvironment.WebRootPath, guide.ProfilePictureUrl.TrimStart('/'));
-                if (File.Exists(oldPath))
-                    File.Delete(oldPath);
-            }
+                await _imageService.DeleteImageAsync(guide.ProfilePictureUrl);
 
-            // حفظ الصورة الجديدة
-            var fileName = $"{Guid.NewGuid()}{extension}";
-            var folderPath = Path.Combine(_webHostEnvironment.WebRootPath, "images", "tourguides");
+            // رفع الصورة الجديدة على Cloudinary
+            var imageUrl = await _imageService.UploadImageAsync(image, "voyagoo/tourguides", cancellationToken);
 
-            if (!Directory.Exists(folderPath))
-                Directory.CreateDirectory(folderPath);
-
-            var filePath = Path.Combine(folderPath, fileName);
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await image.CopyToAsync(stream, cancellationToken);
-
-            guide.ProfilePictureUrl = $"/images/tourguides/{fileName}";
+            guide.ProfilePictureUrl = imageUrl;
             await _context.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
@@ -126,7 +112,7 @@ namespace Voyagoo.Services
             return Result.Success();
         }
 
-        public async Task<Result<GetTourGuideDetailsResponse>> UpdateTourGuideAsync(int id,UpdateTourGuideRequest request,CancellationToken cancellationToken = default)
+        public async Task<Result<GetTourGuideDetailsResponse>> UpdateTourGuideAsync(int id, UpdateTourGuideRequest request, CancellationToken cancellationToken = default)
         {
             var guide = await _context.TourGuides
                 .FirstOrDefaultAsync(g => g.Id == id && !g.IsDeleted, cancellationToken);
@@ -134,7 +120,6 @@ namespace Voyagoo.Services
             if (guide is null)
                 return Result.Failure<GetTourGuideDetailsResponse>(TourGuideErrors.TourGuideNotFound);
 
-            // تأكد إن الـ email مش موجود عند حد تاني
             var isDuplicate = await _context.TourGuides
                 .AnyAsync(g => g.Email == request.Email && g.Id != id && !g.IsDeleted, cancellationToken);
 
@@ -154,12 +139,6 @@ namespace Voyagoo.Services
             return Result.Success(guide.Adapt<GetTourGuideDetailsResponse>());
         }
 
-        public IEnumerable<object> GetAllLanguages()
-        {
-            return Enum.GetValues<Language>()
-                .Select(l => new { id = (int)l, name = l.ToString() });
-        }
-
         public async Task<Result> UpdateTourGuideStatusAsync(int id, TourGuideStatus status, CancellationToken cancellationToken = default)
         {
             var guide = await _context.TourGuides
@@ -176,9 +155,9 @@ namespace Voyagoo.Services
         public async Task<Result<GetTourGuidesAdminResponse>> GetAllTourGuidesAdminAsync(CancellationToken cancellationToken = default)
         {
             var guides = await _context.TourGuides
-        .Where(g => !g.IsDeleted)
-        .AsNoTracking()
-        .ToListAsync(cancellationToken);
+                .Where(g => !g.IsDeleted)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
 
             var items = guides.Select(g =>
             {
@@ -207,6 +186,12 @@ namespace Voyagoo.Services
             );
 
             return Result.Success(response);
+        }
+
+        public IEnumerable<object> GetAllLanguages()
+        {
+            return Enum.GetValues<Language>()
+                .Select(l => new { id = (int)l, name = l.ToString() });
         }
     }
 }
