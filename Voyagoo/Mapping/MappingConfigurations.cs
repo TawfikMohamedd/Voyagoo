@@ -52,7 +52,8 @@ namespace Voyagoo.Mapping
             config.NewConfig<Restaurant, RestaurantAdminItem>()
                 .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
                 .Map(dest => dest.Status, src => src.Status.ToString())
-                .Map(dest => dest.PriceRange, src => $"{src.MinPrice} - {src.MaxPrice} LE");
+                .Map(dest => dest.PriceRange, src => $"{src.MinPrice} - {src.MaxPrice} LE")
+                .Map(dest => dest.TotalTables, src => src.TablesForTwo + src.TablesForFour + src.TablesForSix);
 
 
             #endregion

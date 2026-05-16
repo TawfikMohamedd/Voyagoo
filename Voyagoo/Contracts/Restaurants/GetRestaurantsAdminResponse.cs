@@ -13,6 +13,7 @@
         string CuisineType,
         double Rating,
          string PriceRange,
-        string Status
+        string Status,
+        int TotalTables
     );
 }
