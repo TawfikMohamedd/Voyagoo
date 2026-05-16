@@ -284,5 +284,35 @@ namespace Voyagoo.Services
 
             return Result.Success(feature.Adapt<FeatureResponse>());
         }
+
+        public async Task<Result<GetRestaurantCommentsResponse>> GetRestaurantCommentsAsync(int restaurantId, CancellationToken cancellationToken = default)
+        {
+            var restaurant = await _context.Restaurants
+                .FirstOrDefaultAsync(r => r.Id == restaurantId && !r.IsDeleted, cancellationToken);
+
+            if (restaurant is null)
+                return Result.Failure<GetRestaurantCommentsResponse>(RestaurantErrors.RestaurantNotFound);
+
+            var comments = await _context.RestaurantComments
+                .Where(c => c.RestaurantId == restaurantId)
+                .Include(c => c.User)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var response = new GetRestaurantCommentsResponse(
+                TotalComments: comments.Count,
+                AverageRating: comments.Count > 0 ? Math.Round(comments.Average(c => c.Rating), 1) : 0,
+                Comments: comments.Select(c => new CommentResponse(
+                    c.Id,
+                    c.User.FirstName + " " + c.User.LastName,
+                    c.User.ProfilePictureUrl,
+                    c.Content,
+                    c.Rating,
+                    c.CreatedAt
+                )).ToList()
+            );
+
+            return Result.Success(response);
+        }
     }
 }

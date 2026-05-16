@@ -41,7 +41,7 @@ namespace Voyagoo.Mapping
                 .Select(f => new FeatureResponse(f.FeatureId, f.Feature.Name, f.Feature.Icon))
                 .ToList())
             .Map(dest => dest.Comments, src => src.Comments
-                .Select(c => new CommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.Content, c.Rating, c.CreatedAt))
+                .Select(c => new CommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.User.ProfilePictureUrl, c.Content, c.Rating, c.CreatedAt))
                 .ToList());
 
             config.NewConfig<AddRestaurantRequest, Restaurant>();

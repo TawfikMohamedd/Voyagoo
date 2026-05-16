@@ -99,5 +99,11 @@ namespace Voyagoo.Controllers.Restaurants
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
+        [HttpGet("{id}/GetAllComments")]
+        public async Task<IActionResult> GetComments(int id, CancellationToken cancellationToken)
+        {
+            var result = await _restaurantService.GetRestaurantCommentsAsync(id, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
     }
 }

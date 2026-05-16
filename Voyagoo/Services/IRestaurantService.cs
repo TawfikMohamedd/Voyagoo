@@ -25,5 +25,7 @@ namespace Voyagoo.Services
         Task<Result> UpdateRestaurantStatusAsync(int id, RestaurantStatus status, CancellationToken cancellationToken = default);
 
         Task<Result<GetRestaurantsAdminResponse>> GetAllRestaurantsAdminAsync(CancellationToken cancellationToken = default);
+        Task<Result<GetRestaurantCommentsResponse>> GetRestaurantCommentsAsync(int restaurantId, CancellationToken cancellationToken = default);
+
     }
 }

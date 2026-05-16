@@ -29,6 +29,7 @@
     public record CommentResponse(
         int Id,
         string UserName,
+        string? ProfilePictureUrl,
         string Content,
         int Rating,
         DateTime CreatedAt
