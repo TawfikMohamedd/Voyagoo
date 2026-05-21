@@ -308,11 +308,24 @@ namespace Voyagoo.Services
                     c.User.ProfilePictureUrl,
                     c.Content,
                     c.Rating,
-                    c.CreatedAt
+                    DateOnly.FromDateTime(c.CreatedAt)
                 )).ToList()
             );
 
             return Result.Success(response);
+        }
+        public async Task<Result> DeleteCommentAsync(int restaurantId, int commentId, CancellationToken cancellationToken = default)
+        {
+            var comment = await _context.RestaurantComments
+                .FirstOrDefaultAsync(c => c.Id == commentId && c.RestaurantId == restaurantId, cancellationToken);
+
+            if (comment is null)
+                return Result.Failure(RestaurantErrors.CommentNotFound);
+
+            _context.RestaurantComments.Remove(comment);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
         }
     }
 }

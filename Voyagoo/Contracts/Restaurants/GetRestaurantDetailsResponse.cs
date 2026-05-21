@@ -32,6 +32,6 @@
         string? ProfilePictureUrl,
         string Content,
         int Rating,
-        DateTime CreatedAt
+        DateOnly CreatedAt
     );
 }
