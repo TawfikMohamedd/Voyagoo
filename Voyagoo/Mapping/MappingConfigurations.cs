@@ -53,7 +53,13 @@ namespace Voyagoo.Mapping
                 .Map(dest => dest.CuisineType, src => src.CuisineType.ToString())
                 .Map(dest => dest.Status, src => src.Status.ToString())
                 .Map(dest => dest.PriceRange, src => $"{src.MinPrice} - {src.MaxPrice} LE")
-                .Map(dest => dest.TotalTables, src => src.TablesForTwo + src.TablesForFour + src.TablesForSix);
+                .Map(dest => dest.TotalTables, src => src.TablesForTwo + src.TablesForFour + src.TablesForSix)
+                .Map(dest => dest.MainImageUrl,
+                     src => src.Images.FirstOrDefault(i => i.IsMain) != null
+                         ? src.Images.First(i => i.IsMain).ImageUrl
+                         : src.Images.FirstOrDefault() != null
+                         ? src.Images.First().ImageUrl
+                         : null);
 
 
             #endregion

@@ -14,6 +14,7 @@
         double Rating,
          string PriceRange,
         string Status,
-        int TotalTables
+        int TotalTables,
+        string? MainImageUrl
     );
 }

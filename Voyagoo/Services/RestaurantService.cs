@@ -243,6 +243,7 @@ namespace Voyagoo.Services
         {
             var restaurants = await _context.Restaurants
                 .Where(r => !r.IsDeleted)
+                .Include(r => r.Images)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 

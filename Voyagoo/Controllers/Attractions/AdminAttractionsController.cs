@@ -76,7 +76,7 @@ namespace Voyagoo.Controllers.Attractions
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
-        [HttpGet("Get All categories")]
+        [HttpGet("GetAllCategories")]
         public IActionResult GetCategories()
         {
             var categories = Enum.GetValues<AttractionCategory>()
