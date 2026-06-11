@@ -56,6 +56,8 @@ namespace Voyagoo
             services.AddScoped<IDashboardService, DashboardService>();
             services.AddScoped<IFavoriteService, FavoriteService>();
             services.AddScoped<IImageService, CloudinaryImageService>();
+            services.AddScoped<IUserService, UserService>();
+
 
 
 

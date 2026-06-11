@@ -6,6 +6,7 @@ using Voyagoo.Abstractions.Consts;
 using Voyagoo.Contracts.Restaurants;
 using Voyagoo.Entities.Restaurants;
 using Voyagoo.Services;
+using Voyagoo.Contracts.Common;
 
 namespace Voyagoo.Controllers.Restaurants
 {
@@ -77,9 +78,12 @@ namespace Voyagoo.Controllers.Restaurants
 
 
         [HttpPatch("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] RestaurantStatus status, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request, CancellationToken cancellationToken)
         {
-            var result = await _restaurantService.UpdateRestaurantStatusAsync(id, status, cancellationToken);
+            if (!Enum.TryParse<RestaurantStatus>(request.Status, true, out var parsedStatus) || !Enum.IsDefined(typeof(RestaurantStatus), parsedStatus))
+                return BadRequest("Invalid status value");
+
+            var result = await _restaurantService.UpdateRestaurantStatusAsync(id, parsedStatus, cancellationToken);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 

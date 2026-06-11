@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Voyagoo.Abstractions;
 using Voyagoo.Contracts.Attractions;
+using Voyagoo.Contracts.Common;
 using Voyagoo.Entities.Attractions;
 using Voyagoo.Services;
 
@@ -54,9 +55,12 @@ namespace Voyagoo.Controllers.Attractions
         }
 
         [HttpPatch("{id}/status")]
-        public async Task<IActionResult> UpdateStatus(int id, [FromBody] AttractionStatus status, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request, CancellationToken cancellationToken)
         {
-            var result = await _attractionService.UpdateAttractionStatusAsync(id, status, cancellationToken);
+            if (!Enum.TryParse<AttractionStatus>(request.Status, true, out var parsedStatus) || !Enum.IsDefined(typeof(AttractionStatus), parsedStatus))
+                return BadRequest("Invalid status value");
+
+            var result = await _attractionService.UpdateAttractionStatusAsync(id, parsedStatus, cancellationToken);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Voyagoo.Abstractions;
+using Voyagoo.Abstractions.Consts;
 using Voyagoo.Contracts.Dashboard;
 using Voyagoo.Entities;
 using Voyagoo.Persistence;
@@ -26,7 +27,7 @@ namespace Voyagoo.Services
             var totalAttractions = await _context.Attractions
                 .CountAsync(a => !a.IsDeleted, cancellationToken);
 
-            var totalUsers = await _userManager.Users.CountAsync(cancellationToken);
+            var totalUsers = (await _userManager.GetUsersInRoleAsync(DefaultRoles.Member)).Count;
 
             // Top 3 Restaurants
             var topRestaurants = await _context.Restaurants
