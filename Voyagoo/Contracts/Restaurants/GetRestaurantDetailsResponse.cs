@@ -9,6 +9,9 @@
         string CuisineType,        
         decimal MinPrice,           
         decimal MaxPrice,
+        int TablesForTwo,
+        int TablesForFour,
+        int TablesForSix,
         List<RestaurantImageResponse> Images,
         List<FeatureResponse> Features,
         List<CommentResponse> Comments
