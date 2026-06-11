@@ -9,8 +9,7 @@
 
     public record UserAdminItem(
         string Id,
-        string FirstName,
-        string LastName,
+        string FullName,
         string Email,
         string? PhoneNumber,
         bool IsActive

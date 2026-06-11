@@ -29,8 +29,7 @@ namespace Voyagoo.Services
                 InactiveUsers: users.Count(u => !u.IsActive),
                 Users: users.Select(u => new UserAdminItem(
                     Id: u.Id,
-                    FirstName: u.FirstName,
-                    LastName: u.LastName,
+                    FullName: $"{u.FirstName} {u.LastName}",
                     Email: u.Email!,
                     PhoneNumber: u.PhoneNumber,
                     IsActive: u.IsActive
