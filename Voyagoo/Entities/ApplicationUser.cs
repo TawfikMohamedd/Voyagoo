@@ -10,6 +10,7 @@ namespace Voyagoo.Entities
         public DateTime? PasswordResetOtpExpiry { get; set; }
         public bool IsOtpVerified { get; set; } = false;
         public string? ProfilePictureUrl { get; set; }
+        public bool IsActive { get; set; } = true;
 
         public List<RefreshToken> RefreshTokens { get; set; } = [];
 

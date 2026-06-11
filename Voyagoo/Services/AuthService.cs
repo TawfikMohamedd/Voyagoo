@@ -37,6 +37,10 @@ namespace Voyagoo.Services
             if (!isValidPassword)
                 return null;
 
+
+            if (!user.IsActive)
+                return null;
+
             //generate Jwt token
 
             var roles = await _userManager.GetRolesAsync(user);

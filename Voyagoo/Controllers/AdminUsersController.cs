@@ -18,5 +18,15 @@ namespace Voyagoo.Controllers
             var result = await _userService.GetAllUsersAdminAsync(cancellationToken);
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
+
+        [HttpPatch("{id}/toggle-status")]
+        public async Task<IActionResult> ToggleStatus(string id, CancellationToken cancellationToken)
+        {
+            var result = await _userService.ToggleUserStatusAsync(id, cancellationToken);
+            return result.IsSuccess ? Ok(new { isActive = result.Value }) : result.ToProblem();
+        }
+
+
+
     }
 }

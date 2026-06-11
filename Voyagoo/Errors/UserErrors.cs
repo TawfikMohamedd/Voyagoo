@@ -36,5 +36,8 @@ namespace Voyagoo.Errors
 
         public static readonly Error InvalidImageFile =
     new("User.InvalidImageFile", "Invalid image file. Allowed: jpg, jpeg, png, webp", StatusCodes.Status400BadRequest);
+
+        public static readonly Error UserDeactivated =
+    new("User.Deactivated", "Your account has been deactivated. Please contact support", StatusCodes.Status403Forbidden);
     }
 }

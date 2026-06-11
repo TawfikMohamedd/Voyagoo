@@ -2,6 +2,8 @@
 {
     public record GetUsersAdminResponse(
         int TotalUsers,
+        int ActiveUsers,
+        int InactiveUsers,
         List<UserAdminItem> Users
     );
 
@@ -10,6 +12,7 @@
         string FirstName,
         string LastName,
         string Email,
-        string? PhoneNumber
+        string? PhoneNumber,
+        bool IsActive
     );
 }
