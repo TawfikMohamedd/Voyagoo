@@ -50,7 +50,18 @@ namespace Voyagoo.Controllers.Restaurants
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
 
+        [HttpDelete("{id}/comments/{commentId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteComment(int id, int commentId, CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            if (userId is null)
+                return Unauthorized();
+
+            var result = await _restaurantService.DeleteOwnCommentAsync(id, commentId, userId, cancellationToken);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
 
 
     }

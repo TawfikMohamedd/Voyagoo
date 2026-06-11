@@ -27,6 +27,7 @@ namespace Voyagoo.Services
         Task<Result<GetRestaurantsAdminResponse>> GetAllRestaurantsAdminAsync(CancellationToken cancellationToken = default);
         Task<Result<GetRestaurantCommentsResponse>> GetRestaurantCommentsAsync(int restaurantId, CancellationToken cancellationToken = default);
         Task<Result> DeleteCommentAsync(int restaurantId, int commentId, CancellationToken cancellationToken = default);
+        Task<Result> DeleteOwnCommentAsync(int restaurantId, int commentId, string userId, CancellationToken cancellationToken = default);
 
     }
 }

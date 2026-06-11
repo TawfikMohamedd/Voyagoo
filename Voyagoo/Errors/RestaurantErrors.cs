@@ -24,5 +24,8 @@ namespace Voyagoo.Errors
 
         public static readonly Error CommentNotFound =
             new("Restaurant.CommentNotFound", "Comment not found", StatusCodes.Status404NotFound);
+
+        public static readonly Error CommentNotOwned =
+            new("Restaurant.CommentNotOwned", "You can only delete your own comments", StatusCodes.Status403Forbidden);
     }
 }

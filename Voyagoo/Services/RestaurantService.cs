@@ -328,5 +328,22 @@ namespace Voyagoo.Services
 
             return Result.Success();
         }
+
+        public async Task<Result> DeleteOwnCommentAsync(int restaurantId, int commentId, string userId, CancellationToken cancellationToken = default)
+        {
+            var comment = await _context.RestaurantComments
+                .FirstOrDefaultAsync(c => c.Id == commentId && c.RestaurantId == restaurantId, cancellationToken);
+
+            if (comment is null)
+                return Result.Failure(RestaurantErrors.CommentNotFound);
+
+            if (comment.UserId != userId)
+                return Result.Failure(RestaurantErrors.CommentNotOwned);
+
+            _context.RestaurantComments.Remove(comment);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
+        }
     }
 }
