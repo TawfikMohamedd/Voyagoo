@@ -345,5 +345,37 @@ namespace Voyagoo.Services
 
             return Result.Success();
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public async Task<Result<GetRestaurantDetailsResponse>> GetRestaurantByIdAdminAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var restaurant = await _context.Restaurants
+                .Where(r => r.Id == id && !r.IsDeleted)  // مش بنفلتر على Status هنا
+                .Include(r => r.Images)
+                .Include(r => r.Features).ThenInclude(f => f.Feature)
+                .Include(r => r.Comments).ThenInclude(c => c.User)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (restaurant is null)
+                return Result.Failure<GetRestaurantDetailsResponse>(RestaurantErrors.RestaurantNotFound);
+
+            return Result.Success(restaurant.Adapt<GetRestaurantDetailsResponse>());
+        }
+
+
+
+
     }
 }

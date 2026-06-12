@@ -15,7 +15,6 @@
         public int? AttractionId { get; set; }
         public Voyagoo.Entities.Attractions.Attraction? Attraction { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
 }

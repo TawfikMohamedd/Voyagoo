@@ -116,5 +116,27 @@ namespace Voyagoo.Controllers.Restaurants
             var result = await _restaurantService.DeleteCommentAsync(id, commentId, cancellationToken);
             return result.IsSuccess ? NoContent() : result.ToProblem();
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+        {
+            var result = await _restaurantService.GetRestaurantByIdAdminAsync(id, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+
+
+
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260611110812_AddHotelsModule")]
+    partial class AddHotelsModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -392,7 +395,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHJMzUQQyCudpyHo7WaMHKch5vLv8/11oB/EoagZwTWq2kuWgUcn2A6YQHC2aK6EwA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKFydCC4ngYUG/7UvsiyfISRWjSzxQFhLJIFWcg1Gm8SD5/g/rXxTPofwkUU6C3ENA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -482,6 +485,12 @@ namespace Voyagoo.Persistence.Migrations
                     b.Property<int?>("AttractionId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("HotelId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("RestaurantId")
                         .HasColumnType("int");
 
@@ -496,6 +505,8 @@ namespace Voyagoo.Persistence.Migrations
 
                     b.HasIndex("AttractionId");
 
+                    b.HasIndex("HotelId");
+
                     b.HasIndex("RestaurantId");
 
                     b.HasIndex("TourGuideId");
@@ -503,6 +514,10 @@ namespace Voyagoo.Persistence.Migrations
                     b.HasIndex("UserId", "AttractionId")
                         .IsUnique()
                         .HasFilter("[AttractionId] IS NOT NULL");
+
+                    b.HasIndex("UserId", "HotelId")
+                        .IsUnique()
+                        .HasFilter("[HotelId] IS NOT NULL");
 
                     b.HasIndex("UserId", "RestaurantId")
                         .IsUnique()
@@ -513,6 +528,289 @@ namespace Voyagoo.Persistence.Migrations
                         .HasFilter("[TourGuideId] IS NOT NULL");
 
                     b.ToTable("Favorites");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.DisplayFeature", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DisplayFeatures");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelBooking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DoubleRooms")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("FromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PaidAmount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("PaymentMethod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("RemainingAmount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("ServiceFee")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("StandardRooms")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<decimal>("SubTotal")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("SuiteRooms")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ToDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("TripleRooms")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.ToTable("HotelBookings");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelBookingFeature", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Count")
+                        .HasColumnType("int");
+
+                    b.Property<int>("HotelBookingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelBookingId");
+
+                    b.ToTable("BookingFeatures");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelComment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelDisplayFeature", b =>
+                {
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DisplayFeatureId")
+                        .HasColumnType("int");
+
+                    b.HasKey("HotelId", "DisplayFeatureId");
+
+                    b.HasIndex("DisplayFeatureId");
+
+                    b.ToTable("HotelDisplayFeatures");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("DoublePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("DoubleRooms")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("PricePerNight")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<decimal>("Rating")
+                        .HasColumnType("decimal(3,1)");
+
+                    b.Property<decimal>("StandardPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("StandardRooms")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SuitePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("SuiteRooms")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TriplePrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("TripleRooms")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Hotels");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelFeature", b =>
+                {
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FeatureId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("HotelId", "FeatureId");
+
+                    b.HasIndex("FeatureId");
+
+                    b.ToTable("HotelFeatures");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelFeatureEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("HotelFeatureEntities");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.ToTable("HotelImages");
                 });
 
             modelBuilder.Entity("Voyagoo.Entities.Restaurants.Booking", b =>
@@ -913,6 +1211,11 @@ namespace Voyagoo.Persistence.Migrations
                         .HasForeignKey("AttractionId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelEntity", "Hotel")
+                        .WithMany()
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Voyagoo.Entities.Restaurants.Restaurant", "Restaurant")
                         .WithMany()
                         .HasForeignKey("RestaurantId")
@@ -931,11 +1234,103 @@ namespace Voyagoo.Persistence.Migrations
 
                     b.Navigation("Attraction");
 
+                    b.Navigation("Hotel");
+
                     b.Navigation("Restaurant");
 
                     b.Navigation("TourGuide");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelBooking", b =>
+                {
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelEntity", "Hotel")
+                        .WithMany()
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelBookingFeature", b =>
+                {
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelBooking", "HotelBooking")
+                        .WithMany("Features")
+                        .HasForeignKey("HotelBookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HotelBooking");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelComment", b =>
+                {
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelEntity", "Hotel")
+                        .WithMany("Comments")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voyagoo.Entities.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelDisplayFeature", b =>
+                {
+                    b.HasOne("Voyagoo.Entities.Hotels.DisplayFeature", "DisplayFeature")
+                        .WithMany()
+                        .HasForeignKey("DisplayFeatureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelEntity", "Hotel")
+                        .WithMany("HotelDisplayFeatures")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DisplayFeature");
+
+                    b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelFeature", b =>
+                {
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelFeatureEntity", "Feature")
+                        .WithMany("HotelFeatures")
+                        .HasForeignKey("FeatureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelEntity", "Hotel")
+                        .WithMany("HotelFeatures")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Feature");
+
+                    b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelImage", b =>
+                {
+                    b.HasOne("Voyagoo.Entities.Hotels.HotelEntity", "Hotel")
+                        .WithMany("Images")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
                 });
 
             modelBuilder.Entity("Voyagoo.Entities.Restaurants.Booking", b =>
@@ -1028,6 +1423,27 @@ namespace Voyagoo.Persistence.Migrations
             modelBuilder.Entity("Voyagoo.Entities.Attractions.Attraction", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelBooking", b =>
+                {
+                    b.Navigation("Features");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelEntity", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("HotelDisplayFeatures");
+
+                    b.Navigation("HotelFeatures");
+
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelFeatureEntity", b =>
+                {
+                    b.Navigation("HotelFeatures");
                 });
 
             modelBuilder.Entity("Voyagoo.Entities.Restaurants.Feature", b =>
