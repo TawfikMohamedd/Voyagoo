@@ -30,6 +30,10 @@ namespace Voyagoo.Persistence.EntitiesConfigurations.Favorites
                    .HasForeignKey(x => x.AttractionId)
                    .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasOne(x => x.Hotel)
+                   .WithMany()
+                   .HasForeignKey(x => x.HotelId)
+                   .OnDelete(DeleteBehavior.NoAction);
             // يوزر ميقدرش يعمل favorite نفس المطعم مرتين
             builder.HasIndex(x => new { x.UserId, x.RestaurantId })
                    .IsUnique()
@@ -42,6 +46,10 @@ namespace Voyagoo.Persistence.EntitiesConfigurations.Favorites
             builder.HasIndex(x => new { x.UserId, x.AttractionId })
                    .IsUnique()
                    .HasFilter("[AttractionId] IS NOT NULL");
+
+            builder.HasIndex(x => new { x.UserId, x.HotelId })
+                   .IsUnique()
+                   .HasFilter("[HotelId] IS NOT NULL");
         }
     }
 }

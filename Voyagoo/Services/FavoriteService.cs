@@ -2,6 +2,7 @@
 using Voyagoo.Abstractions;
 using Voyagoo.Contracts.Favorites;
 using Voyagoo.Entities.Favorites;
+using Voyagoo.Entities.Hotels;
 using Voyagoo.Errors;
 using Voyagoo.Persistence;
 
@@ -11,19 +12,18 @@ namespace Voyagoo.Services
     {
         private readonly VoyagooDbContext _context = context;
 
-        public async Task<Result> AddFavoriteAsync(string userId, int? restaurantId, int? tourGuideId, int? attractionId, CancellationToken cancellationToken = default)
+        public async Task<Result> AddFavoriteAsync(string userId, int? restaurantId, int? tourGuideId, int? attractionId, int? hotelId, CancellationToken cancellationToken = default)
         {
-            // لازم يبعت واحد بس
-            var count = new[] { restaurantId, tourGuideId, attractionId }.Count(x => x.HasValue);
+            var count = new[] { restaurantId, tourGuideId, attractionId, hotelId }.Count(x => x.HasValue);
             if (count != 1)
                 return Result.Failure(FavoriteErrors.InvalidFavoriteType);
 
-            // تأكد مش موجود قبل كده
             var alreadyExists = await _context.Favorites.AnyAsync(f =>
                 f.UserId == userId &&
                 f.RestaurantId == restaurantId &&
                 f.TourGuideId == tourGuideId &&
-                f.AttractionId == attractionId,
+                f.AttractionId == attractionId &&
+                f.HotelId == hotelId,
                 cancellationToken);
 
             if (alreadyExists)
@@ -34,18 +34,18 @@ namespace Voyagoo.Services
                 UserId = userId,
                 RestaurantId = restaurantId,
                 TourGuideId = tourGuideId,
-                AttractionId = attractionId
+                AttractionId = attractionId,
+                HotelId = hotelId
             };
 
             await _context.Favorites.AddAsync(favorite, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-
             return Result.Success();
         }
 
-        public async Task<Result> RemoveFavoriteAsync(string userId, int? restaurantId, int? tourGuideId, int? attractionId, CancellationToken cancellationToken = default)
+        public async Task<Result> RemoveFavoriteAsync(string userId, int? restaurantId, int? tourGuideId, int? attractionId, int? hotelId, CancellationToken cancellationToken = default)
         {
-            var count = new[] { restaurantId, tourGuideId, attractionId }.Count(x => x.HasValue);
+            var count = new[] { restaurantId, tourGuideId, attractionId, hotelId }.Count(x => x.HasValue);
             if (count != 1)
                 return Result.Failure(FavoriteErrors.InvalidFavoriteType);
 
@@ -53,7 +53,8 @@ namespace Voyagoo.Services
                 f.UserId == userId &&
                 f.RestaurantId == restaurantId &&
                 f.TourGuideId == tourGuideId &&
-                f.AttractionId == attractionId,
+                f.AttractionId == attractionId &&
+                f.HotelId == hotelId,
                 cancellationToken);
 
             if (favorite is null)
@@ -61,7 +62,6 @@ namespace Voyagoo.Services
 
             _context.Favorites.Remove(favorite);
             await _context.SaveChangesAsync(cancellationToken);
-
             return Result.Success();
         }
 
@@ -72,6 +72,7 @@ namespace Voyagoo.Services
                 .Include(f => f.Restaurant).ThenInclude(r => r!.Images)
                 .Include(f => f.TourGuide)
                 .Include(f => f.Attraction).ThenInclude(a => a!.Images)
+                .Include(f => f.Hotel).ThenInclude(h => h!.Images)
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
@@ -106,12 +107,24 @@ namespace Voyagoo.Services
                         ?? f.Attraction.Images.FirstOrDefault()?.ImageUrl
                 )).ToList();
 
-            return Result.Success(new GetFavoritesResponse(restaurants, tourGuides, attractions));
+            var hotels = favorites
+                .Where(f => f.HotelId.HasValue && f.Hotel != null && !f.Hotel.IsDeleted)
+                .Select(f => new FavoriteHotelItem(
+                    Id: f.Hotel!.Id,
+                    Name: f.Hotel.Name,
+                    Location: f.Hotel.Location,
+                    Rating: f.Hotel.Rating,
+                    MainImageUrl: f.Hotel.Images.FirstOrDefault(i => i.IsMain)?.ImageUrl
+                        ?? f.Hotel.Images.FirstOrDefault()?.ImageUrl
+                )).ToList();
+
+            return Result.Success(new GetFavoritesResponse(restaurants, tourGuides, attractions, hotels));
+
         }
 
-        public async Task<Result<bool>> ToggleFavoriteAsync(string userId, int? restaurantId, int? tourGuideId, int? attractionId, CancellationToken cancellationToken = default)
+        public async Task<Result<bool>> ToggleFavoriteAsync(string userId, int? restaurantId, int? tourGuideId, int? attractionId, int? hotelId, CancellationToken cancellationToken = default)
         {
-            var count = new[] { restaurantId, tourGuideId, attractionId }.Count(x => x.HasValue);
+            var count = new[] { restaurantId, tourGuideId, attractionId, hotelId }.Count(x => x.HasValue);
             if (count != 1)
                 return Result.Failure<bool>(FavoriteErrors.InvalidFavoriteType);
 
@@ -119,29 +132,29 @@ namespace Voyagoo.Services
                 f.UserId == userId &&
                 f.RestaurantId == restaurantId &&
                 f.TourGuideId == tourGuideId &&
-                f.AttractionId == attractionId,
+                f.AttractionId == attractionId &&
+                f.HotelId == hotelId,
                 cancellationToken);
 
-            // لو موجود امسحه
             if (existing is not null)
             {
                 _context.Favorites.Remove(existing);
                 await _context.SaveChangesAsync(cancellationToken);
-                return Result.Success(false); // false = اتشال
+                return Result.Success(false);
             }
 
-            // لو مش موجود ضيفه
             var favorite = new Favorite
             {
                 UserId = userId,
                 RestaurantId = restaurantId,
                 TourGuideId = tourGuideId,
-                AttractionId = attractionId
+                AttractionId = attractionId,
+                HotelId = hotelId
             };
 
             await _context.Favorites.AddAsync(favorite, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            return Result.Success(true); // true = اتضاف
+            return Result.Success(true);
         }
     }
 }

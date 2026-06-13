@@ -3,7 +3,8 @@
     public record GetFavoritesResponse(
         List<FavoriteRestaurantItem> Restaurants,
         List<FavoriteTourGuideItem> TourGuides,
-        List<FavoriteAttractionItem> Attractions
+        List<FavoriteAttractionItem> Attractions,
+        List<FavoriteHotelItem> Hotels
     );
 
     public record FavoriteRestaurantItem(
@@ -28,4 +29,12 @@
         double Rating,
         string? MainImageUrl
     );
+
+    public record FavoriteHotelItem(
+    int Id,
+    string Name,
+    string Location,
+    double Rating,
+    string? MainImageUrl
+);
 }

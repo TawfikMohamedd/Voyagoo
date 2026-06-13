@@ -15,6 +15,9 @@
         public int? AttractionId { get; set; }
         public Voyagoo.Entities.Attractions.Attraction? Attraction { get; set; }
 
+        public int? HotelId { get; set; }
+        public Voyagoo.Entities.Hotels.Hotel? Hotel { get; set; }
+
     }
 
 }
