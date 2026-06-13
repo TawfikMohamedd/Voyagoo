@@ -1,10 +1,12 @@
 ﻿using Mapster;
 using Voyagoo.Contracts.Attractions;
 using Voyagoo.Contracts.Authentication.Register;
+using Voyagoo.Contracts.Hotels;
 using Voyagoo.Contracts.Restaurants;
 using Voyagoo.Contracts.TourGuides;
 using Voyagoo.Entities;
 using Voyagoo.Entities.Attractions;
+using Voyagoo.Entities.Hotels;
 using Voyagoo.Entities.Restaurants;
 using Voyagoo.Entities.TourGuides;
 
@@ -104,6 +106,47 @@ namespace Voyagoo.Mapping
                     : src.Images.FirstOrDefault() != null
                     ? src.Images.First().ImageUrl
                     : null);
+
+            #endregion
+
+
+            #region Hotels
+
+            config.NewConfig<Hotel, GetHotelsResponse>()
+                .Map(dest => dest.MainImageUrl,
+                    src => src.Images.FirstOrDefault(i => i.IsMain) != null
+                        ? src.Images.First(i => i.IsMain).ImageUrl
+                        : src.Images.FirstOrDefault() != null
+                        ? src.Images.First().ImageUrl
+                        : null);
+
+            config.NewConfig<Hotel, GetHotelDetailsResponse>()
+                .Map(dest => dest.Images, src => src.Images
+                    .Select(i => new HotelImageResponse(i.Id, i.ImageUrl, i.IsMain))
+                    .ToList())
+                .Map(dest => dest.Features, src => src.Features
+                    .Select(f => new HotelFeatureResponse(f.HotelFeatureId, f.HotelFeature.Name, f.HotelFeature.Icon))
+                    .ToList())
+                .Map(dest => dest.Comments, src => src.Comments
+                    .Select(c => new HotelCommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.User.ProfilePictureUrl, c.Content, c.Rating, DateOnly.FromDateTime(c.CreatedAt)))
+                    .ToList());
+
+            config.NewConfig<AddHotelRequest, Hotel>();
+
+            config.NewConfig<AddHotelFeatureRequest, HotelFeature>();
+
+            config.NewConfig<HotelFeature, HotelFeatureResponse>();
+
+            config.NewConfig<Hotel, HotelAdminItem>()
+                .Map(dest => dest.Status, src => src.Status.ToString())
+                .Map(dest => dest.MainImageUrl,
+                    src => src.Images.FirstOrDefault(i => i.IsMain) != null
+                        ? src.Images.First(i => i.IsMain).ImageUrl
+                        : src.Images.FirstOrDefault() != null
+                        ? src.Images.First().ImageUrl
+                        : null);
+
+
 
             #endregion
 

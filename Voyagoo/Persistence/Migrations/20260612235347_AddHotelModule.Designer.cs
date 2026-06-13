@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260612235347_AddHotelModule")]
+    partial class AddHotelModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -392,7 +395,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAED5SxjYy2B/Bm0KiavGl4cQ66hDYmYt+se/hdm1f3oAZatMgZPNyjQTsWwoPXNqUWw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJimp0quJUC7GWFMuNCiUCtcWmUHNrnmdSaVAzWrXnGhisnPEoOCDAhtkZ9pqMgLfA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -550,41 +553,6 @@ namespace Voyagoo.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Hotels");
-                });
-
-            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelComment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("HotelId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("HotelId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("HotelComments");
                 });
 
             modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelFeature", b =>
@@ -1073,25 +1041,6 @@ namespace Voyagoo.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelComment", b =>
-                {
-                    b.HasOne("Voyagoo.Entities.Hotels.Hotel", "Hotel")
-                        .WithMany("Comments")
-                        .HasForeignKey("HotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Voyagoo.Entities.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Hotel");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Voyagoo.Entities.Hotels.HotelFeatureMap", b =>
                 {
                     b.HasOne("Voyagoo.Entities.Hotels.HotelFeature", "HotelFeature")
@@ -1216,8 +1165,6 @@ namespace Voyagoo.Persistence.Migrations
 
             modelBuilder.Entity("Voyagoo.Entities.Hotels.Hotel", b =>
                 {
-                    b.Navigation("Comments");
-
                     b.Navigation("Features");
 
                     b.Navigation("Images");

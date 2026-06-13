@@ -58,6 +58,9 @@ namespace Voyagoo
             services.AddScoped<IImageService, CloudinaryImageService>();
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<IHotelService, HotelService>();
+
+
 
 
 
