@@ -113,6 +113,11 @@ namespace Voyagoo.Mapping
             #region Hotels
 
             config.NewConfig<Hotel, GetHotelsResponse>()
+                .Map(dest => dest.MinPrice, src => new[] { src.SinglePrice, src.DoublePrice, src.TriplePrice, src.SuitePrice }
+                     .Where(p => p > 0).DefaultIfEmpty(0).Min())
+                .Map(dest => dest.MaxPrice, src => new[] { src.SinglePrice, src.DoublePrice, src.TriplePrice, src.SuitePrice }
+                     .Where(p => p > 0).DefaultIfEmpty(0).Max())
+
                 .Map(dest => dest.MainImageUrl,
                     src => src.Images.FirstOrDefault(i => i.IsMain) != null
                         ? src.Images.First(i => i.IsMain).ImageUrl
@@ -139,12 +144,15 @@ namespace Voyagoo.Mapping
 
             config.NewConfig<Hotel, HotelAdminItem>()
                 .Map(dest => dest.Status, src => src.Status.ToString())
+                .Map(dest => dest.PriceRange, src => $"{new[] { src.SinglePrice, src.DoublePrice, src.TriplePrice, src.SuitePrice }.Where(p => p > 0).DefaultIfEmpty(0).Min()} - {new[] { src.SinglePrice, src.DoublePrice, src.TriplePrice, src.SuitePrice }.Max()} LE")
+                .Map(dest => dest.TotalRooms, src => src.SingleRooms + src.DoubleRooms + src.TripleRooms + src.SuiteRooms)
                 .Map(dest => dest.MainImageUrl,
                     src => src.Images.FirstOrDefault(i => i.IsMain) != null
                         ? src.Images.First(i => i.IsMain).ImageUrl
                         : src.Images.FirstOrDefault() != null
                         ? src.Images.First().ImageUrl
                         : null);
+
 
 
 

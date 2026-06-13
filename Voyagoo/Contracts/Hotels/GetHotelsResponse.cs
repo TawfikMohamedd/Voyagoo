@@ -6,6 +6,8 @@
         string Description,
         string Location,
         double Rating,
+        decimal MinPrice,
+        decimal MaxPrice,
         string? MainImageUrl
     );
 }

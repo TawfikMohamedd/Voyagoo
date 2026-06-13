@@ -12,7 +12,9 @@
         string Name,
         string Location,
         double Rating,
+        string PriceRange,
         string Status,
+        int TotalRooms,
         string? MainImageUrl
     );
 }

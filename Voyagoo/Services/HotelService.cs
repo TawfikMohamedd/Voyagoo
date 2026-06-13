@@ -149,6 +149,14 @@ namespace Voyagoo.Services
             hotel.Description = request.Description;
             hotel.Location = request.Location;
             hotel.Rating = request.Rating;
+            hotel.SingleRooms = request.SingleRooms;
+            hotel.SinglePrice = request.SinglePrice;
+            hotel.DoubleRooms = request.DoubleRooms;
+            hotel.DoublePrice = request.DoublePrice;
+            hotel.TripleRooms = request.TripleRooms;
+            hotel.TriplePrice = request.TriplePrice;
+            hotel.SuiteRooms = request.SuiteRooms;
+            hotel.SuitePrice = request.SuitePrice;
 
             hotel.Features = request.FeatureIds.Select(fId => new HotelFeatureMap
             {

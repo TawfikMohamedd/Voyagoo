@@ -24,6 +24,20 @@ namespace Voyagoo.Contracts.Hotels
 
             RuleFor(x => x.FeatureIds)
                 .NotNull();
+
+            RuleFor(x => x.SingleRooms).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.DoubleRooms).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.TripleRooms).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.SuiteRooms).GreaterThanOrEqualTo(0);
+
+            RuleFor(x => x.SinglePrice).GreaterThan(0).WithMessage("Single room price must be greater than 0");
+            RuleFor(x => x.DoublePrice).GreaterThan(0).WithMessage("Double room price must be greater than 0");
+            RuleFor(x => x.TriplePrice).GreaterThan(0).WithMessage("Triple room price must be greater than 0");
+            RuleFor(x => x.SuitePrice).GreaterThan(0).WithMessage("Suite room price must be greater than 0");
+
+            RuleFor(x => x)
+                .Must(x => x.SingleRooms + x.DoubleRooms + x.TripleRooms + x.SuiteRooms > 0)
+                .WithMessage("Hotel must have at least one room");
         }
     }
 }

@@ -23,6 +23,11 @@ namespace Voyagoo.Persistence.EntitiesConfigurations.Hotels
                    .WithOne(x => x.Hotel)
                    .HasForeignKey(x => x.HotelId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(x => x.SinglePrice).HasColumnType("decimal(10,2)");
+            builder.Property(x => x.DoublePrice).HasColumnType("decimal(10,2)");
+            builder.Property(x => x.TriplePrice).HasColumnType("decimal(10,2)");
+            builder.Property(x => x.SuitePrice).HasColumnType("decimal(10,2)");
         }
     }
 }
