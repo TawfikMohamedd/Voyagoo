@@ -3,14 +3,17 @@
     public record GetDashboardResponse(
         DashboardOverview Overview,
         List<TopRestaurantItem> TopRestaurants,
-        List<TopTourGuideItem> TopTourGuides
+        List<TopTourGuideItem> TopTourGuides,
+        List<TopHotelItem> TopHotels,
+        List<RecentUserItem> RecentUsers
     );
 
     public record DashboardOverview(
         int TotalRestaurants,
         int TotalTourGuides,
         int TotalAttractions,
-        int TotalUsers
+        int TotalUsers,
+        int TotalHotels
     );
 
     public record TopRestaurantItem(
@@ -26,5 +29,18 @@
         string Name,
         double Rating,
         string Status
+    );
+    public record TopHotelItem(
+        int Id,
+        string Name,
+        double Rating,
+        string Status
+    );
+
+    public record RecentUserItem(
+        string Id,
+        string FullName,
+        string Email,
+        DateTime CreatedAt
     );
 }

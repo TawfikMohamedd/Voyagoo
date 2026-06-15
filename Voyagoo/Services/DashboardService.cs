@@ -27,6 +27,9 @@ namespace Voyagoo.Services
             var totalAttractions = await _context.Attractions
                 .CountAsync(a => !a.IsDeleted, cancellationToken);
 
+            var totalHotels = await _context.Hotels
+                .CountAsync(h => !h.IsDeleted, cancellationToken);
+
             var totalUsers = (await _userManager.GetUsersInRoleAsync(DefaultRoles.Member)).Count;
 
             // Top 3 Restaurants
@@ -45,12 +48,32 @@ namespace Voyagoo.Services
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
+            // Top 3 Hotels
+            var topHotels = await _context.Hotels
+                .Where(h => !h.IsDeleted)
+                .OrderByDescending(h => h.Rating)
+                .Take(3)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            // Recent 3 Users
+            var recentUsers = (await _userManager.GetUsersInRoleAsync(DefaultRoles.Member))
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(3)
+                .Select(u => new RecentUserItem(
+                    Id: u.Id,
+                    FullName: $"{u.FirstName} {u.LastName}",
+                    Email: u.Email!,
+                    CreatedAt: u.CreatedAt
+                )).ToList();
+
             var response = new GetDashboardResponse(
                 Overview: new DashboardOverview(
                     TotalRestaurants: totalRestaurants,
                     TotalTourGuides: totalTourGuides,
                     TotalAttractions: totalAttractions,
-                    TotalUsers: totalUsers
+                    TotalUsers: totalUsers,
+                    TotalHotels: totalHotels
                 ),
                 TopRestaurants: topRestaurants.Select(r => new TopRestaurantItem(
                     Id: r.Id,
@@ -64,7 +87,14 @@ namespace Voyagoo.Services
                     Name: g.Name,
                     Rating: g.Rating,
                     Status: g.Status.ToString()
-                )).ToList()
+                )).ToList(),
+                TopHotels: topHotels.Select(h => new TopHotelItem(
+                    Id: h.Id,
+                    Name: h.Name,
+                    Rating: h.Rating,
+                    Status: h.Status.ToString()
+                )).ToList(),
+                RecentUsers: recentUsers
             );
 
             return Result.Success(response);
