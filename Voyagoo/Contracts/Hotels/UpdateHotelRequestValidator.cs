@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Voyagoo.Abstractions.Consts;
 
 namespace Voyagoo.Contracts.Hotels
 {
@@ -59,6 +60,21 @@ namespace Voyagoo.Contracts.Hotels
                     .GreaterThanOrEqualTo(0)
                     .WithMessage("Booking feature price must be 0 or more");
             });
+
+
+            RuleFor(x => x.FullBoardPrice)
+                .GreaterThan(0)
+                .WithMessage("Full board price must be greater than 0");
+
+            RuleFor(x => x.HalfBoardPrice)
+                .GreaterThan(0)
+                .WithMessage("Half board price must be greater than 0");
+
+            RuleFor(x => x.BookingFeatures)
+    .Must(features => features.All(f =>
+        f.BookingFeatureId != DefaultBookingFeatures.FullBoardId &&
+        f.BookingFeatureId != DefaultBookingFeatures.HalfBoardId))
+    .WithMessage("Full Board and Half Board are handled separately, do not include them in BookingFeatures");
         }
     }
 }

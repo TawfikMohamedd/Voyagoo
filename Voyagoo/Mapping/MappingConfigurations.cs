@@ -1,4 +1,5 @@
 ﻿using Mapster;
+using Voyagoo.Abstractions.Consts;
 using Voyagoo.Contracts.Attractions;
 using Voyagoo.Contracts.Authentication.Register;
 using Voyagoo.Contracts.Hotels;
@@ -136,7 +137,13 @@ namespace Voyagoo.Mapping
                     .Select(c => new HotelCommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.User.ProfilePictureUrl, c.Content, c.Rating, DateOnly.FromDateTime(c.CreatedAt)))
                     .ToList())
                 .Map(dest => dest.BookingFeatures, src => src.BookingFeatures
-                    .Select(bf => new HotelBookingFeatureResponse(bf.BookingFeatureId, bf.BookingFeature.Name, bf.BookingFeature.Icon, bf.Price))
+                    .Select(bf => new HotelBookingFeatureResponse(
+                        bf.BookingFeatureId,
+                        bf.BookingFeature.Name,
+                        bf.BookingFeature.Icon,
+                        bf.Price,
+                        bf.BookingFeatureId == DefaultBookingFeatures.FullBoardId || bf.BookingFeatureId == DefaultBookingFeatures.HalfBoardId
+                    ))
                     .ToList());
 
             config.NewConfig<AddBookingFeatureRequest, BookingFeature>();

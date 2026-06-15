@@ -5,6 +5,7 @@
         List<TopRestaurantItem> TopRestaurants,
         List<TopTourGuideItem> TopTourGuides,
         List<TopHotelItem> TopHotels,
+        List<TopAttractionItem> TopAttractions,
         List<RecentUserItem> RecentUsers
     );
 
@@ -33,9 +34,17 @@
     public record TopHotelItem(
         int Id,
         string Name,
+        string Location,
         double Rating,
         string Status
     );
+    public record TopAttractionItem(
+    int Id,
+    string Name,
+    string Category,
+    double Rating,
+    string Status
+);
 
     public record RecentUserItem(
         string Id,

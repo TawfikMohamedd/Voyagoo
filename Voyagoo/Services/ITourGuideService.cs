@@ -17,6 +17,8 @@ namespace Voyagoo.Services
         Task<Result<GetTourGuideDetailsResponse>> UpdateTourGuideAsync(int id, UpdateTourGuideRequest request, CancellationToken cancellationToken = default);
         Task<Result> UpdateTourGuideStatusAsync(int id, TourGuideStatus status, CancellationToken cancellationToken = default);
         Task<Result<GetTourGuidesAdminResponse>> GetAllTourGuidesAdminAsync(CancellationToken cancellationToken = default);
+        Task<Result<GetTourGuideDetailsResponse>> GetTourGuideByIdAdminAsync(int id, CancellationToken cancellationToken = default);
+
 
         // Helper للـ Frontend
         IEnumerable<object> GetAllLanguages();

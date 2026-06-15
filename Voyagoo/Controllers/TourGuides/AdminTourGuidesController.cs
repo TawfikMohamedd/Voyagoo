@@ -82,5 +82,12 @@ namespace Voyagoo.Controllers.TourGuides
             var result = await _tourGuideService.GetAllTourGuidesAdminAsync(cancellationToken);
             return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+        {
+            var result = await _tourGuideService.GetTourGuideByIdAdminAsync(id, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
     }
 }

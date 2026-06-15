@@ -1,6 +1,7 @@
 ﻿using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Voyagoo.Abstractions;
+using Voyagoo.Abstractions.Consts;
 using Voyagoo.Contracts.Hotels;
 using Voyagoo.Entities.Hotels;
 using Voyagoo.Errors;
@@ -9,8 +10,8 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Services
 {
     public class HotelService(
-       VoyagooDbContext context,
-       IImageService imageService) : IHotelService
+        VoyagooDbContext context,
+        IImageService imageService) : IHotelService
     {
         private readonly VoyagooDbContext _context = context;
         private readonly IImageService _imageService = imageService;
@@ -81,6 +82,19 @@ namespace Voyagoo.Services
                 BookingFeatureId = bf.BookingFeatureId,
                 Price = bf.Price
             }).ToList();
+
+            // Fixed/required booking features: Full Board & Half Board
+            hotel.BookingFeatures.Add(new HotelBookingFeature
+            {
+                BookingFeatureId = DefaultBookingFeatures.FullBoardId,
+                Price = request.FullBoardPrice
+            });
+
+            hotel.BookingFeatures.Add(new HotelBookingFeature
+            {
+                BookingFeatureId = DefaultBookingFeatures.HalfBoardId,
+                Price = request.HalfBoardPrice
+            });
 
             await _context.Hotels.AddAsync(hotel, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
@@ -199,6 +213,21 @@ namespace Voyagoo.Services
                 BookingFeatureId = bf.BookingFeatureId,
                 Price = bf.Price
             }).ToList();
+
+            // Fixed/required booking features: Full Board & Half Board
+            hotel.BookingFeatures.Add(new HotelBookingFeature
+            {
+                HotelId = id,
+                BookingFeatureId = DefaultBookingFeatures.FullBoardId,
+                Price = request.FullBoardPrice
+            });
+
+            hotel.BookingFeatures.Add(new HotelBookingFeature
+            {
+                HotelId = id,
+                BookingFeatureId = DefaultBookingFeatures.HalfBoardId,
+                Price = request.HalfBoardPrice
+            });
 
             await _context.SaveChangesAsync(cancellationToken);
 

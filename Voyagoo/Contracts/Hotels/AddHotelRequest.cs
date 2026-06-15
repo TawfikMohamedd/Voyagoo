@@ -15,6 +15,8 @@
         decimal SuitePrice,
         decimal Discount,
         decimal ServiceCharge,
+        decimal FullBoardPrice,
+        decimal HalfBoardPrice,
         List<int> FeatureIds,
         List<HotelBookingFeatureRequest> BookingFeatures
     );

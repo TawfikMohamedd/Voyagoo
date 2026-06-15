@@ -38,6 +38,7 @@
     int Id,
     string Name,
     string Icon,
-    decimal Price
+    decimal Price,
+        bool IsFixed
 );
 }

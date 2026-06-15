@@ -56,6 +56,14 @@ namespace Voyagoo.Services
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
+            // Top 3 Attractions
+            var topAttractions = await _context.Attractions
+                .Where(a => !a.IsDeleted)
+                .OrderByDescending(a => a.Rating)
+                .Take(3)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
             // Recent 3 Users
             var recentUsers = (await _userManager.GetUsersInRoleAsync(DefaultRoles.Member))
                 .OrderByDescending(u => u.CreatedAt)
@@ -91,8 +99,16 @@ namespace Voyagoo.Services
                 TopHotels: topHotels.Select(h => new TopHotelItem(
                     Id: h.Id,
                     Name: h.Name,
+                    Location: h.Location,
                     Rating: h.Rating,
                     Status: h.Status.ToString()
+                )).ToList(),
+                TopAttractions: topAttractions.Select(a => new TopAttractionItem(  
+                    Id: a.Id,
+                    Name: a.Name,
+                    Category: a.Category.ToString(),
+                    Rating: a.Rating,
+                    Status: a.Status.ToString()
                 )).ToList(),
                 RecentUsers: recentUsers
             );

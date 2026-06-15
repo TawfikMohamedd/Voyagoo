@@ -194,5 +194,18 @@ namespace Voyagoo.Services
             return Enum.GetValues<Language>()
                 .Select(l => new { id = (int)l, name = l.ToString() });
         }
+
+        public async Task<Result<GetTourGuideDetailsResponse>> GetTourGuideByIdAdminAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var guide = await _context.TourGuides
+                .Where(g => g.Id == id && !g.IsDeleted)  // مش بنفلتر على Status زي الـ public
+                .AsNoTracking()
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (guide is null)
+                return Result.Failure<GetTourGuideDetailsResponse>(TourGuideErrors.TourGuideNotFound);
+
+            return Result.Success(guide.Adapt<GetTourGuideDetailsResponse>());
+        }
     }
 }
