@@ -28,5 +28,7 @@ namespace Voyagoo.Services
         Task<Result<GetHotelCommentsResponse>> GetHotelCommentsAsync(int hotelId, CancellationToken cancellationToken = default);
         Task<Result> DeleteCommentAsync(int hotelId, int commentId, CancellationToken cancellationToken = default);
         Task<Result> DeleteOwnCommentAsync(int hotelId, int commentId, string userId, CancellationToken cancellationToken = default);
+        Task<Result<List<BookingFeatureResponse>>> GetAllBookingFeaturesAsync(CancellationToken cancellationToken = default);
+        Task<Result<BookingFeatureResponse>> AddBookingFeatureAsync(AddBookingFeatureRequest request, CancellationToken cancellationToken = default);
     }
 }

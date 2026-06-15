@@ -15,6 +15,7 @@
         decimal SuitePrice,
         decimal Discount,
         decimal ServiceCharge,
-        List<int> FeatureIds
+        List<int> FeatureIds,
+        List<HotelBookingFeatureRequest> BookingFeatures
     );
 }

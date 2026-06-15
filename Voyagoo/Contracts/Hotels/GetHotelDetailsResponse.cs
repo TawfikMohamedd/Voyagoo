@@ -18,7 +18,8 @@
         decimal ServiceCharge,
         List<HotelImageResponse> Images,
         List<HotelFeatureResponse> Features,
-        List<HotelCommentResponse> Comments
+        List<HotelCommentResponse> Comments,
+        List<HotelBookingFeatureResponse> BookingFeatures
     );
 
     public record HotelImageResponse(
@@ -32,4 +33,11 @@
         string Name,
         string Icon
     );
+
+    public record HotelBookingFeatureResponse(
+    int Id,
+    string Name,
+    string Icon,
+    decimal Price
+);
 }

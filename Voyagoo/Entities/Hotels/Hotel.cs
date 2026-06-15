@@ -12,6 +12,7 @@
         public List<HotelImage> Images { get; set; } = [];
         public List<HotelFeatureMap> Features { get; set; } = [];
         public List<HotelComment> Comments { get; set; } = [];
+        public List<HotelBookingFeature> BookingFeatures { get; set; } = [];
         public int SingleRooms { get; set; }
         public decimal SinglePrice { get; set; }
         public int DoubleRooms { get; set; }

@@ -9,8 +9,8 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Services
 {
     public class HotelService(
-        VoyagooDbContext context,
-        IImageService imageService) : IHotelService
+       VoyagooDbContext context,
+       IImageService imageService) : IHotelService
     {
         private readonly VoyagooDbContext _context = context;
         private readonly IImageService _imageService = imageService;
@@ -37,6 +37,7 @@ namespace Voyagoo.Services
                 .Include(h => h.Images)
                 .Include(h => h.Features).ThenInclude(f => f.HotelFeature)
                 .Include(h => h.Comments).ThenInclude(c => c.User)
+                .Include(h => h.BookingFeatures).ThenInclude(bf => bf.BookingFeature)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -59,11 +60,26 @@ namespace Voyagoo.Services
             if (featuresExist != request.FeatureIds.Count)
                 return Result.Failure<GetHotelDetailsResponse>(HotelErrors.FeatureNotFound);
 
+            var bookingFeatureIds = request.BookingFeatures.Select(bf => bf.BookingFeatureId).ToList();
+
+            var bookingFeaturesExist = await _context.BookingFeatures
+                .Where(f => bookingFeatureIds.Contains(f.Id))
+                .CountAsync(cancellationToken);
+
+            if (bookingFeaturesExist != bookingFeatureIds.Distinct().Count())
+                return Result.Failure<GetHotelDetailsResponse>(HotelErrors.BookingFeatureNotFound);
+
             var hotel = request.Adapt<Hotel>();
 
             hotel.Features = request.FeatureIds.Select(fId => new HotelFeatureMap
             {
                 HotelFeatureId = fId
+            }).ToList();
+
+            hotel.BookingFeatures = request.BookingFeatures.Select(bf => new HotelBookingFeature
+            {
+                BookingFeatureId = bf.BookingFeatureId,
+                Price = bf.Price
             }).ToList();
 
             await _context.Hotels.AddAsync(hotel, cancellationToken);
@@ -73,6 +89,7 @@ namespace Voyagoo.Services
                 .Where(h => h.Id == hotel.Id)
                 .Include(h => h.Images)
                 .Include(h => h.Features).ThenInclude(f => f.HotelFeature)
+                .Include(h => h.BookingFeatures).ThenInclude(bf => bf.BookingFeature)
                 .AsNoTracking()
                 .FirstAsync(cancellationToken);
 
@@ -133,6 +150,7 @@ namespace Voyagoo.Services
             var hotel = await _context.Hotels
                 .Include(h => h.Features)
                 .Include(h => h.Images)
+                .Include(h => h.BookingFeatures)
                 .FirstOrDefaultAsync(h => h.Id == id && !h.IsDeleted, cancellationToken);
 
             if (hotel is null)
@@ -144,6 +162,15 @@ namespace Voyagoo.Services
 
             if (featuresExist != request.FeatureIds.Count)
                 return Result.Failure<GetHotelDetailsResponse>(HotelErrors.FeatureNotFound);
+
+            var bookingFeatureIds = request.BookingFeatures.Select(bf => bf.BookingFeatureId).ToList();
+
+            var bookingFeaturesExist = await _context.BookingFeatures
+                .Where(f => bookingFeatureIds.Contains(f.Id))
+                .CountAsync(cancellationToken);
+
+            if (bookingFeaturesExist != bookingFeatureIds.Distinct().Count())
+                return Result.Failure<GetHotelDetailsResponse>(HotelErrors.BookingFeatureNotFound);
 
             hotel.Name = request.Name;
             hotel.Description = request.Description;
@@ -166,12 +193,20 @@ namespace Voyagoo.Services
                 HotelFeatureId = fId
             }).ToList();
 
+            hotel.BookingFeatures = request.BookingFeatures.Select(bf => new HotelBookingFeature
+            {
+                HotelId = id,
+                BookingFeatureId = bf.BookingFeatureId,
+                Price = bf.Price
+            }).ToList();
+
             await _context.SaveChangesAsync(cancellationToken);
 
             var updated = await _context.Hotels
                 .Where(h => h.Id == id)
                 .Include(h => h.Images)
                 .Include(h => h.Features).ThenInclude(f => f.HotelFeature)
+                .Include(h => h.BookingFeatures).ThenInclude(bf => bf.BookingFeature)
                 .AsNoTracking()
                 .FirstAsync(cancellationToken);
 
@@ -240,6 +275,7 @@ namespace Voyagoo.Services
                 .Include(h => h.Images)
                 .Include(h => h.Features).ThenInclude(f => f.HotelFeature)
                 .Include(h => h.Comments).ThenInclude(c => c.User)
+                .Include(h => h.BookingFeatures).ThenInclude(bf => bf.BookingFeature)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -277,6 +313,39 @@ namespace Voyagoo.Services
 
             return Result.Success(feature.Adapt<HotelFeatureResponse>());
         }
+
+        // ─────────────────────────────────────────────
+        // ADMIN - BOOKING FEATURES
+        // ─────────────────────────────────────────────
+
+        public async Task<Result<List<BookingFeatureResponse>>> GetAllBookingFeaturesAsync(CancellationToken cancellationToken = default)
+        {
+            var features = await _context.BookingFeatures
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            return Result.Success(features.Adapt<List<BookingFeatureResponse>>());
+        }
+
+        public async Task<Result<BookingFeatureResponse>> AddBookingFeatureAsync(AddBookingFeatureRequest request, CancellationToken cancellationToken = default)
+        {
+            var isDuplicate = await _context.BookingFeatures
+                .AnyAsync(f => f.Name == request.Name, cancellationToken);
+
+            if (isDuplicate)
+                return Result.Failure<BookingFeatureResponse>(HotelErrors.DuplicateBookingFeature);
+
+            var feature = request.Adapt<BookingFeature>();
+
+            await _context.BookingFeatures.AddAsync(feature, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success(feature.Adapt<BookingFeatureResponse>());
+        }
+
+        // ─────────────────────────────────────────────
+        // COMMENTS
+        // ─────────────────────────────────────────────
 
         public async Task<Result> AddCommentAsync(int hotelId, string userId, AddHotelCommentRequest request, CancellationToken cancellationToken = default)
         {

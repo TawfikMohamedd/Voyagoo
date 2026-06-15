@@ -46,6 +46,19 @@ namespace Voyagoo.Contracts.Hotels
             RuleFor(x => x.ServiceCharge)
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Service charge must be 0 or more");
+
+            RuleFor(x => x.BookingFeatures)
+                .NotNull();
+
+            RuleForEach(x => x.BookingFeatures).ChildRules(feature =>
+            {
+                feature.RuleFor(f => f.BookingFeatureId)
+                    .GreaterThan(0);
+
+                feature.RuleFor(f => f.Price)
+                    .GreaterThanOrEqualTo(0)
+                    .WithMessage("Booking feature price must be 0 or more");
+            });
         }
     }
 }

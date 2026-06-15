@@ -134,7 +134,14 @@ namespace Voyagoo.Mapping
                     .ToList())
                 .Map(dest => dest.Comments, src => src.Comments
                     .Select(c => new HotelCommentResponse(c.Id, c.User.FirstName + " " + c.User.LastName, c.User.ProfilePictureUrl, c.Content, c.Rating, DateOnly.FromDateTime(c.CreatedAt)))
+                    .ToList())
+                .Map(dest => dest.BookingFeatures, src => src.BookingFeatures
+                    .Select(bf => new HotelBookingFeatureResponse(bf.BookingFeatureId, bf.BookingFeature.Name, bf.BookingFeature.Icon, bf.Price))
                     .ToList());
+
+            config.NewConfig<AddBookingFeatureRequest, BookingFeature>();
+
+            config.NewConfig<BookingFeature, BookingFeatureResponse>();
 
             config.NewConfig<AddHotelRequest, Hotel>();
 
