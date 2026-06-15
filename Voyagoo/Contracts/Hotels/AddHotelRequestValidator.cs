@@ -38,6 +38,14 @@ namespace Voyagoo.Contracts.Hotels
             RuleFor(x => x)
                 .Must(x => x.SingleRooms + x.DoubleRooms + x.TripleRooms + x.SuiteRooms > 0)
                 .WithMessage("Hotel must have at least one room");
+
+            RuleFor(x => x.Discount)
+                .InclusiveBetween(0, 100)
+                .WithMessage("Discount must be between 0 and 100");
+
+            RuleFor(x => x.ServiceCharge)
+                .GreaterThanOrEqualTo(0)
+                .WithMessage("Service charge must be 0 or more");
         }
     }
 }

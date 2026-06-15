@@ -14,6 +14,8 @@
         decimal TriplePrice,
         int SuiteRooms,
         decimal SuitePrice,
+        decimal Discount,
+        decimal ServiceCharge,
         List<HotelImageResponse> Images,
         List<HotelFeatureResponse> Features,
         List<HotelCommentResponse> Comments

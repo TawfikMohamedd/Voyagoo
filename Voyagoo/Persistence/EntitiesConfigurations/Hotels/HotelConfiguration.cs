@@ -28,6 +28,8 @@ namespace Voyagoo.Persistence.EntitiesConfigurations.Hotels
             builder.Property(x => x.DoublePrice).HasColumnType("decimal(10,2)");
             builder.Property(x => x.TriplePrice).HasColumnType("decimal(10,2)");
             builder.Property(x => x.SuitePrice).HasColumnType("decimal(10,2)");
+            builder.Property(x => x.Discount).HasColumnType("decimal(5,2)");
+            builder.Property(x => x.ServiceCharge).HasColumnType("decimal(5,2)");
         }
     }
 }

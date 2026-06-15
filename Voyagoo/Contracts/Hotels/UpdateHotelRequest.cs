@@ -13,6 +13,8 @@
         decimal TriplePrice,
         int SuiteRooms,
         decimal SuitePrice,
+        decimal Discount,
+        decimal ServiceCharge,
         List<int> FeatureIds
     );
 }

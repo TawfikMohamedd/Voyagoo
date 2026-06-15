@@ -157,6 +157,8 @@ namespace Voyagoo.Services
             hotel.TriplePrice = request.TriplePrice;
             hotel.SuiteRooms = request.SuiteRooms;
             hotel.SuitePrice = request.SuitePrice;
+            hotel.Discount = request.Discount;
+            hotel.ServiceCharge = request.ServiceCharge;
 
             hotel.Features = request.FeatureIds.Select(fId => new HotelFeatureMap
             {
