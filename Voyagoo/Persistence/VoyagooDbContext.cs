@@ -50,6 +50,10 @@ namespace Voyagoo.Persistence
         public DbSet<HotelComment> HotelComments { get; set; }
         public DbSet<BookingFeature> BookingFeatures { get; set; }
         public DbSet<HotelBookingFeature> HotelBookingFeatures { get; set; }
+        public DbSet<HotelBooking> HotelBookings { get; set; }
+        public DbSet<HotelBookingRoom> HotelBookingRooms { get; set; }
+        public DbSet<HotelBookingFeatureSelection> HotelBookingFeatureSelections { get; set; }
+
 
 
     }

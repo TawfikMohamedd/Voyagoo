@@ -59,6 +59,8 @@ namespace Voyagoo
             services.AddScoped<IUserService, UserService>();
 
             services.AddScoped<IHotelService, HotelService>();
+            services.AddScoped<IHotelBookingService, HotelBookingService>();
+
 
 
 
