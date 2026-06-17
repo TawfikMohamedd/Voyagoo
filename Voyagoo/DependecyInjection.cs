@@ -53,13 +53,19 @@ namespace Voyagoo
             services.AddScoped<ITourGuideBookingService, TourGuideBookingService>();
 
             services.AddScoped<IAttractionService, AttractionService>();
+
             services.AddScoped<IDashboardService, DashboardService>();
+
             services.AddScoped<IFavoriteService, FavoriteService>();
+
             services.AddScoped<IImageService, CloudinaryImageService>();
+
             services.AddScoped<IUserService, UserService>();
 
             services.AddScoped<IHotelService, HotelService>();
             services.AddScoped<IHotelBookingService, HotelBookingService>();
+
+            services.AddScoped<IHomeService, HomeService>();
 
 
 
