@@ -23,6 +23,10 @@
         public decimal ServiceChargePercentage { get; set; }
         public decimal ServiceChargeAmount { get; set; }
         public decimal TotalPrice { get; set; }
+        public BookingStatus Status { get; set; } = BookingStatus.Pending;
+        public string PaymentType { get; set; } = string.Empty;
+
+
 
         public List<HotelBookingRoom> Rooms { get; set; } = [];
         public List<HotelBookingFeatureSelection> SelectedFeatures { get; set; } = [];

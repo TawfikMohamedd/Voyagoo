@@ -10,5 +10,15 @@ namespace Voyagoo.Services
             string userId,
             CreateHotelBookingRequest request,
             CancellationToken cancellationToken = default);
+
+        Task<Result> ConfirmBookingAsync(
+            int bookingId,
+            string userId,
+            ConfirmHotelBookingRequest request,
+            CancellationToken cancellationToken = default);
+
+        Task<Result<GetBookingHistoryResponse>> GetBookingHistoryAsync(
+            string userId,
+            CancellationToken cancellationToken = default);
     }
 }

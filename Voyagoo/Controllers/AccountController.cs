@@ -55,5 +55,31 @@ namespace Voyagoo.Controllers
 
             return result.IsSuccess ? Ok(new { profilePictureUrl = result.Value }) : result.ToProblem();
         }
+
+
+
+
+
+        [HttpGet("bookings")]
+        public async Task<IActionResult> GetAllBookings(CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized();
+
+            var result = await _accountService.GetAllBookingsAsync(userId, cancellationToken);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
+        }
+
+
+
+        [HttpDelete("bookings/{bookingId}")]
+        public async Task<IActionResult> DeleteBooking(int bookingId,[FromQuery] string bookingType,CancellationToken cancellationToken)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized();
+
+            var result = await _accountService.DeleteBookingAsync(userId, bookingId, bookingType, cancellationToken);
+            return result.IsSuccess ? NoContent() : result.ToProblem();
+        }
     }
 }

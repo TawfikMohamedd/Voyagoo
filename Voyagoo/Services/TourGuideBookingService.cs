@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Voyagoo.Abstractions;
 using Voyagoo.Contracts.TourGuides;
 using Voyagoo.Entities;
+using Voyagoo.Entities.Hotels;
 using Voyagoo.Entities.TourGuides;
 using Voyagoo.Errors;
 using Voyagoo.Persistence;
@@ -88,6 +89,64 @@ namespace Voyagoo.Services
                     $"Voyagoo - Tour Guide Booking Confirmation #{booking.Id}",
                     emailBody);
             }
+
+            return Result.Success(response);
+        }
+        public async Task<Result> ConfirmBookingAsync(
+    int bookingId,
+    string userId,
+    ConfirmTourGuideBookingRequest request,
+    CancellationToken cancellationToken = default)
+        {
+            var booking = await _context.TourGuideBookings
+                .FirstOrDefaultAsync(b => b.Id == bookingId, cancellationToken);
+
+            if (booking is null)
+                return Result.Failure(TourGuideBookingErrors.BookingNotFound);
+
+            if (booking.UserId != userId)
+                return Result.Failure(TourGuideBookingErrors.BookingNotOwned);
+
+            if (!string.IsNullOrEmpty(booking.PaymentType))
+                return Result.Failure(TourGuideBookingErrors.BookingAlreadyConfirmed);
+
+            booking.PaymentType = request.PaymentType.ToLower();
+            booking.Status = request.PaymentType.ToLower() == "card"
+                ? BookingStatus.Completed
+                : BookingStatus.Pending;
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
+        }
+
+        public async Task<Result<GetTourGuideBookingHistoryResponse>> GetBookingHistoryAsync(
+            string userId,
+            CancellationToken cancellationToken = default)
+        {
+            var bookings = await _context.TourGuideBookings
+                .Where(b => b.UserId == userId && !string.IsNullOrEmpty(b.PaymentType))
+                .Include(b => b.TourGuide)
+                .OrderByDescending(b => b.CreatedAt)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var items = bookings.Select(b => new TourGuideBookingHistoryItem(
+                b.Id,
+                b.TourGuide.Name,
+                b.BookingDate,
+                b.NumberOfDays,
+                b.TourGuide.PricePerDay,
+                b.TotalPrice,
+                b.PaymentType,
+                b.Status.ToString(),
+                b.CreatedAt
+            )).ToList();
+
+            var response = new GetTourGuideBookingHistoryResponse(
+                Pending: items.Where(b => b.Status == "Pending").ToList(),
+                Completed: items.Where(b => b.Status == "Completed").ToList()
+            );
 
             return Result.Success(response);
         }

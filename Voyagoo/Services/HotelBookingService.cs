@@ -250,5 +250,89 @@ namespace Voyagoo.Services
             RoomType.Suite => (hotel.SuiteRooms, hotel.SuitePrice),
             _ => (0, 0)
         };
+
+        public async Task<Result> ConfirmBookingAsync(
+    int bookingId,
+    string userId,
+    ConfirmHotelBookingRequest request,
+    CancellationToken cancellationToken = default)
+        {
+            var booking = await _context.HotelBookings
+                .FirstOrDefaultAsync(b => b.Id == bookingId, cancellationToken);
+
+            if (booking is null)
+                return Result.Failure(HotelBookingErrors.BookingNotFound);
+
+            if (booking.UserId != userId)
+                return Result.Failure(HotelBookingErrors.BookingNotOwned);
+
+            if (booking.Status != BookingStatus.Pending || !string.IsNullOrEmpty(booking.PaymentType))
+                return Result.Failure(HotelBookingErrors.BookingAlreadyConfirmed);
+
+            booking.PaymentType = request.PaymentType.ToLower();
+            booking.Status = request.PaymentType.ToLower() == "card"
+                ? BookingStatus.Completed
+                : BookingStatus.Pending;
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success();
+        }
+
+        public async Task<Result<GetBookingHistoryResponse>> GetBookingHistoryAsync(
+            string userId,
+            CancellationToken cancellationToken = default)
+        {
+            var bookings = await _context.HotelBookings
+                .Where(b => b.UserId == userId && !string.IsNullOrEmpty(b.PaymentType))
+                .Include(b => b.Hotel)
+                .Include(b => b.Rooms)
+                .Include(b => b.SelectedFeatures).ThenInclude(sf => sf.BookingFeature)
+                .OrderByDescending(b => b.CreatedAt)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            var items = bookings.Select(b => new BookingHistoryItem(
+                b.Id,
+                b.Hotel.Name,
+                b.CheckIn,
+                b.CheckOut,
+                b.Nights,
+                b.Rooms.Select(r => new BookedRoomItem(
+                    r.RoomType.ToString(),
+                    r.Quantity,
+                    r.PricePerNight,
+                    r.PricePerNight * b.Nights * r.Quantity
+                )).ToList(),
+                b.SelectedFeatures.Select(sf => new BookedFeatureItem(
+                    sf.BookingFeatureId,
+                    sf.BookingFeature.Name,
+                    sf.BookingFeature.Icon,
+                    sf.RoomsCount,
+                    sf.PricePerNight,
+                    sf.PricePerNight * b.Nights * sf.RoomsCount
+                )).ToList(),
+                b.RoomsTotal,
+                b.BoardsTotal,
+                b.ExtrasTotal,
+                b.Subtotal,
+                b.DiscountPercentage,
+                b.DiscountAmount,
+                b.ServiceChargePercentage,
+                b.ServiceChargeAmount,
+                b.TotalPrice,
+                b.PaymentType,
+                b.Status.ToString(),
+                b.CreatedAt
+            )).ToList();
+
+            var response = new GetBookingHistoryResponse(
+                Pending: items.Where(b => b.Status == "Pending").ToList(),
+                Completed: items.Where(b => b.Status == "Completed").ToList()
+            );
+
+            return Result.Success(response);
+        }
+
     }
 }

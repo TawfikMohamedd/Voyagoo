@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Voyagoo.Entities.TourGuides;
 
@@ -34,13 +35,20 @@ namespace Voyagoo.Persistence.EntitiesConfigurations.TourGuides
 
             // نخزن الـ Languages كـ comma-separated string في column واحد
             builder.Property(x => x.Languages)
-                   .HasConversion(
-                       v => string.Join(',', v.Select(l => (int)l)),
-                       v => v.Split(',', StringSplitOptions.RemoveEmptyEntries)
-                             .Select(x => (Language)int.Parse(x))
-                             .ToList()
-                   )
-                   .HasMaxLength(200);
+       .HasConversion(
+           v => string.Join(',', v.Select(l => (int)l)),
+           v => v.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                 .Select(x => (Language)int.Parse(x))
+                 .ToList()
+       )
+       .HasMaxLength(200)
+       .Metadata.SetValueComparer(new ValueComparer<List<Language>>(
+           (c1, c2) => c1!.SequenceEqual(c2!),
+           c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+           c => c.ToList()
+       ));
+
+            builder.Property(x => x.PricePerDay).HasColumnType("decimal(18,2)");
         }
     }
 }

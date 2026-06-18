@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260617231240_AddBookingStatusAndPaymentType")]
+    partial class AddBookingStatusAndPaymentType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -386,7 +389,7 @@ namespace Voyagoo.Persistence.Migrations
                             Id = "6dc6528a-b280-4770-9eae-82671ee81ef7",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "99d2bbc6-bc54-4248-a172-a77de3ae4430",
-                            CreatedAt = new DateTime(2026, 6, 18, 0, 0, 44, 937, DateTimeKind.Utc).AddTicks(1212),
+                            CreatedAt = new DateTime(2026, 6, 17, 23, 12, 39, 575, DateTimeKind.Utc).AddTicks(9081),
                             Email = "admin@Voyago.com",
                             EmailConfirmed = true,
                             FirstName = "Voyago",
@@ -396,7 +399,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAqD4hZ151FW3lPRYl1rQ/UMWyu+dd2tiy5GvoDoMkuEZvyyj9x0oJMaoiV+NYLEhA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEF1O2tP0onhaCp3K2FbYjkW4wqoqitEeexewZsYG5czr1PO6qdKcXp2oO3YWq8h4Ew==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,
@@ -1113,7 +1116,7 @@ namespace Voyagoo.Persistence.Migrations
                         .HasColumnType("nvarchar(11)");
 
                     b.Property<decimal>("PricePerDay")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.Property<string>("ProfilePictureUrl")
                         .HasMaxLength(500)
@@ -1145,13 +1148,6 @@ namespace Voyagoo.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("NumberOfDays")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PaymentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalPrice")

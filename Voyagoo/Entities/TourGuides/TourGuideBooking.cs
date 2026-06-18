@@ -1,4 +1,6 @@
-﻿namespace Voyagoo.Entities.TourGuides
+﻿using Voyagoo.Entities.Hotels;
+
+namespace Voyagoo.Entities.TourGuides
 {
     public class TourGuideBooking
     {
@@ -13,5 +15,8 @@
         public ApplicationUser User { get; set; } = default!;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public BookingStatus Status { get; set; } = BookingStatus.Pending;
+        public string PaymentType { get; set; } = string.Empty;
     }
 }

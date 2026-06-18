@@ -23,6 +23,9 @@ namespace Voyagoo.Persistence.EntitiesConfigurations.Restaurants
                    .WithOne(x => x.Restaurant)
                    .HasForeignKey(x => x.RestaurantId)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(x => x.MinPrice).HasColumnType("decimal(10,2)");
+            builder.Property(x => x.MaxPrice).HasColumnType("decimal(10,2)");
         }
     }
 }
