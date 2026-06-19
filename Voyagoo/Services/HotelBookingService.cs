@@ -185,39 +185,6 @@ namespace Voyagoo.Services
             await _context.HotelBookings.AddAsync(booking, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
 
-
-            // ── بعت الـ Confirmation Email ──
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is not null)
-            {
-                var emailBody = EmailTemplates.GetHotelBookingConfirmationTemplate(
-                    user.FirstName,
-                    new CreateHotelBookingResponse(
-                        booking.Id,
-                        hotel.Name,
-                        booking.CheckIn,
-                        booking.CheckOut,
-                        booking.Nights,
-                        roomItems,
-                        featureItems,
-                        roomsTotal,
-                        boardsTotal,
-                        extrasTotal,
-                        subtotal,
-                        hotel.Discount,
-                        discountAmount,
-                        hotel.ServiceCharge,
-                        serviceChargeAmount,
-                        totalPrice
-                    )
-                );
-
-                await _emailSender.SendEmailAsync(
-                    user.Email!,
-                    $"Voyagoo - Booking Confirmation #{booking.Id}",
-                    emailBody
-                );
-            }
             return Result.Success(new CreateHotelBookingResponse(
                 booking.Id,
                 hotel.Name,
@@ -250,7 +217,12 @@ namespace Voyagoo.Services
         public async Task<Result> ConfirmBookingAsync(int bookingId,string userId,ConfirmHotelBookingRequest request,CancellationToken cancellationToken = default)
         {
             var booking = await _context.HotelBookings
-                .FirstOrDefaultAsync(b => b.Id == bookingId, cancellationToken);
+                .Where(b => b.Id == bookingId)
+                .Include(b => b.Hotel)
+                .Include(b => b.Rooms)
+                .Include(b => b.SelectedFeatures)
+                    .ThenInclude(sf => sf.BookingFeature)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (booking is null)
                 return Result.Failure(HotelBookingErrors.BookingNotFound);
@@ -268,7 +240,59 @@ namespace Voyagoo.Services
 
             await _context.SaveChangesAsync(cancellationToken);
 
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is not null)
+            {
+                var roomItems = booking.Rooms.Select(r => new BookedRoomItem(
+                    r.RoomType.ToString(),
+                    r.Quantity,
+                    r.PricePerNight,
+                    r.PricePerNight * booking.Nights * r.Quantity
+                )).ToList();
+
+                var featureItems = booking.SelectedFeatures.Select(sf => new BookedFeatureItem(
+                    sf.BookingFeatureId,
+                    sf.BookingFeature.Name,
+                    sf.BookingFeature.Icon,
+                    sf.RoomsCount,
+                    sf.PricePerNight,
+                    sf.PricePerNight * booking.Nights * sf.RoomsCount
+                )).ToList();
+
+                var emailBody = EmailTemplates.GetHotelBookingConfirmationTemplate(
+                    user.FirstName,
+                    new CreateHotelBookingResponse(
+                        booking.Id,
+                        booking.Hotel.Name,
+                        booking.CheckIn,
+                        booking.CheckOut,
+                        booking.Nights,
+                        roomItems,
+                        featureItems,
+                        booking.RoomsTotal,
+                        booking.BoardsTotal,
+                        booking.ExtrasTotal,
+                        booking.Subtotal,
+                        booking.DiscountPercentage,
+                        booking.DiscountAmount,
+                        booking.ServiceChargePercentage,
+                        booking.ServiceChargeAmount,
+                        booking.TotalPrice
+                    )
+                );
+
+                await _emailSender.SendEmailAsync(
+                    user.Email!,
+                    $"Voyagoo - Booking Confirmation #{booking.Id}",
+                    emailBody
+                );
+            }
+
+
             return Result.Success();
+
+
         }
 
         public async Task<Result<GetBookingHistoryResponse>> GetBookingHistoryAsync(string userId,CancellationToken cancellationToken = default)

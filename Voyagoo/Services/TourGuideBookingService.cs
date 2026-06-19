@@ -11,20 +11,19 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Services
 {
     public class TourGuideBookingService(
-    VoyagooDbContext context,
-    UserManager<ApplicationUser> userManager,
-    IEmailSender emailSender) : ITourGuideBookingService
+        VoyagooDbContext context,
+        UserManager<ApplicationUser> userManager,
+        IEmailSender emailSender) : ITourGuideBookingService
     {
         private readonly VoyagooDbContext _context = context;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IEmailSender _emailSender = emailSender;
 
-
-    public async Task<Result<CreateTourGuideBookingResponse>> CreateBookingAsync(
-        int tourGuideId,
-        string userId,
-        CreateTourGuideBookingRequest request,
-        CancellationToken cancellationToken = default)
+        public async Task<Result<CreateTourGuideBookingResponse>> CreateBookingAsync(
+            int tourGuideId,
+            string userId,
+            CreateTourGuideBookingRequest request,
+            CancellationToken cancellationToken = default)
         {
             var tourGuide = await _context.TourGuides
                 .FirstOrDefaultAsync(
@@ -74,32 +73,19 @@ namespace Voyagoo.Services
                 booking.TotalPrice
             );
 
-            // إرسال إيميل تأكيد الحجز
-            var user = await _userManager.FindByIdAsync(userId);
-
-            if (user is not null)
-            {
-                var emailBody =
-                    EmailTemplates.GetTourGuideBookingConfirmationTemplate(
-                        user.FirstName,
-                        response);
-
-                await _emailSender.SendEmailAsync(
-                    user.Email!,
-                    $"Voyagoo - Tour Guide Booking Confirmation #{booking.Id}",
-                    emailBody);
-            }
-
             return Result.Success(response);
         }
+
         public async Task<Result> ConfirmBookingAsync(
-    int bookingId,
-    string userId,
-    ConfirmTourGuideBookingRequest request,
-    CancellationToken cancellationToken = default)
+            int bookingId,
+            string userId,
+            ConfirmTourGuideBookingRequest request,
+            CancellationToken cancellationToken = default)
         {
             var booking = await _context.TourGuideBookings
-                .FirstOrDefaultAsync(b => b.Id == bookingId, cancellationToken);
+                .Where(b => b.Id == bookingId)
+                .Include(b => b.TourGuide)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (booking is null)
                 return Result.Failure(TourGuideBookingErrors.BookingNotFound);
@@ -116,6 +102,30 @@ namespace Voyagoo.Services
                 : BookingStatus.Pending;
 
             await _context.SaveChangesAsync(cancellationToken);
+
+            //Send Confirmation Email
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is not null)
+            {
+                var response = new CreateTourGuideBookingResponse(
+                    booking.Id,
+                    booking.TourGuide.Name,
+                    booking.BookingDate,
+                    booking.NumberOfDays,
+                    booking.TourGuide.PricePerDay,
+                    booking.TotalPrice
+                );
+
+                var emailBody = EmailTemplates.GetTourGuideBookingConfirmationTemplate(
+                    user.FirstName,
+                    response);
+
+                await _emailSender.SendEmailAsync(
+                    user.Email!,
+                    $"Voyagoo - Tour Guide Booking Confirmation #{booking.Id}",
+                    emailBody);
+            }
 
             return Result.Success();
         }
@@ -151,6 +161,4 @@ namespace Voyagoo.Services
             return Result.Success(response);
         }
     }
-
-
 }
