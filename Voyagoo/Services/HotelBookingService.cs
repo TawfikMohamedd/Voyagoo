@@ -19,11 +19,7 @@ namespace Voyagoo.Services
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IEmailSender _emailSender = emailSender;
 
-        public async Task<Result<CreateHotelBookingResponse>> CreateBookingAsync(
-            int hotelId,
-            string userId,
-            CreateHotelBookingRequest request,
-            CancellationToken cancellationToken = default)
+        public async Task<Result<CreateHotelBookingResponse>> CreateBookingAsync(int hotelId,string userId,CreateHotelBookingRequest request,CancellationToken cancellationToken = default)
         {
             var hotel = await _context.Hotels
                 .Where(h => h.Id == hotelId && !h.IsDeleted)
@@ -251,11 +247,7 @@ namespace Voyagoo.Services
             _ => (0, 0)
         };
 
-        public async Task<Result> ConfirmBookingAsync(
-    int bookingId,
-    string userId,
-    ConfirmHotelBookingRequest request,
-    CancellationToken cancellationToken = default)
+        public async Task<Result> ConfirmBookingAsync(int bookingId,string userId,ConfirmHotelBookingRequest request,CancellationToken cancellationToken = default)
         {
             var booking = await _context.HotelBookings
                 .FirstOrDefaultAsync(b => b.Id == bookingId, cancellationToken);
@@ -279,9 +271,7 @@ namespace Voyagoo.Services
             return Result.Success();
         }
 
-        public async Task<Result<GetBookingHistoryResponse>> GetBookingHistoryAsync(
-            string userId,
-            CancellationToken cancellationToken = default)
+        public async Task<Result<GetBookingHistoryResponse>> GetBookingHistoryAsync(string userId,CancellationToken cancellationToken = default)
         {
             var bookings = await _context.HotelBookings
                 .Where(b => b.UserId == userId && !string.IsNullOrEmpty(b.PaymentType))
