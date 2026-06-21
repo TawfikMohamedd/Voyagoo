@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Voyagoo.Persistence;
 
@@ -11,9 +12,11 @@ using Voyagoo.Persistence;
 namespace Voyagoo.Persistence.Migrations
 {
     [DbContext(typeof(VoyagooDbContext))]
-    partial class VoyagooDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260619235217_AddBudgetPlanning")]
+    partial class AddBudgetPlanning
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -386,7 +389,7 @@ namespace Voyagoo.Persistence.Migrations
                             Id = "6dc6528a-b280-4770-9eae-82671ee81ef7",
                             AccessFailedCount = 0,
                             ConcurrencyStamp = "99d2bbc6-bc54-4248-a172-a77de3ae4430",
-                            CreatedAt = new DateTime(2026, 6, 20, 1, 45, 1, 63, DateTimeKind.Utc).AddTicks(3125),
+                            CreatedAt = new DateTime(2026, 6, 19, 23, 52, 15, 888, DateTimeKind.Utc).AddTicks(8335),
                             Email = "admin@Voyago.com",
                             EmailConfirmed = true,
                             FirstName = "Voyago",
@@ -396,7 +399,7 @@ namespace Voyagoo.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@VOYAGO.COM",
                             NormalizedUserName = "ADMIN@VOYAGO.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIZw9IN4HQWMFEUA78WxHW0qnqkeB0i4ejyWsOouyS4Z8ZKGzxB4qbeHDeO63ETvhA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBg8OWE28f4whG1oDWVMrrBONPZhsIuj1Gpzs0jSpTExWed6z00L0ubZPXL369aa7Q==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "55BF92C9EF0249CDA210D85D1A851BC9",
                             TwoFactorEnabled = false,

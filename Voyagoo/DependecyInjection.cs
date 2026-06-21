@@ -67,6 +67,9 @@ namespace Voyagoo
 
             services.AddScoped<IHomeService, HomeService>();
 
+            services.AddScoped<IBudgetPlanService, BudgetPlanService>();
+
+
 
 
 
